@@ -156,34 +156,10 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 <div class="box" style="max-width:340px;margin:auto;text-align:center;">
   <div class="login-icon">📅</div>
   <div class="login-title">Family Calendar</div>
-  <div class="login-sub">Fully Kiosk nu permite login Google direct.<br>Urmează pașii de mai jos:</div>
-  
-  <div style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <div style="width:20px;height:20px;border-radius:50%;background:var(--seb);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</div>
-        <div style="font-size:12px;color:var(--txt2);line-height:1.5;">Deschide <strong style="color:var(--txt);">Chrome</strong> pe tabletă (minimizează Fully Kiosk)</div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <div style="width:20px;height:20px;border-radius:50%;background:var(--seb);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</div>
-        <div style="font-size:12px;color:var(--txt2);line-height:1.5;">Mergi la același URL și loghează-te cu Google</div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <div style="width:20px;height:20px;border-radius:50%;background:var(--seb);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</div>
-        <div style="font-size:12px;color:var(--txt2);line-height:1.5;">În Chrome, apasă butonul <strong style="color:var(--seb);">Copiază token</strong> din calendar</div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <div style="width:20px;height:20px;border-radius:50%;background:var(--seb);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">4</div>
-        <div style="font-size:12px;color:var(--txt2);line-height:1.5;">Revino în Fully Kiosk și lipește tokenul mai jos</div>
-      </div>
-    </div>
-  </div>
-
-  <div style="margin-bottom:10px;">
-    <textarea id="token-input" placeholder="Lipește tokenul aici..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:11px;color:var(--txt);background:var(--bg);outline:none;resize:none;height:60px;"></textarea>
-  </div>
-  <button class="google-btn" onclick="useToken()" style="margin-bottom:8px;">
-    ✓ Folosește tokenul
+  <div class="login-sub">Loghează-te cu Google pentru acces la calendar.<br>Datele rămân <strong style="color:var(--seb);">100% private</strong>.</div>
+  <button class="google-btn" onclick="signIn()">
+    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    Continuă cu Google
   </button>
   <button class="btn-demo" onclick="loadDemo()">✦ Mod demo (fără login)</button>
   <div class="login-note" id="login-note"></div>
@@ -224,7 +200,6 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
         <div class="s-txt" id="stxt">—</div>
         <button class="icon-btn" onclick="fetchEvents()" title="Actualizează">↻</button>
         <button class="fs-btn" onclick="toggleFS()" title="Fullscreen" id="fsbtn">⛶</button>
-        <button class="icon-btn" onclick="copyToken()" title="Copiază token pentru Fully Kiosk" style="font-size:9px;background:var(--seb);color:#fff;border-color:var(--seb);">TK</button>
         <button class="icon-btn" onclick="resetAll()" title="Setări">⚙</button>
       </div>
     </div>
@@ -306,152 +281,53 @@ const KW={'sebastian':'#4CAF8A','seb':'#4CAF8A','alina':'#E07070','ali':'#E07070
 const DR=['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
 const MR=['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'];
 
-let cfg={clientId:'962389587713-9bcdelhudu5oonsfekkn9klv14ba949g.apps.googleusercontent.com',city:'Oradea'};
-let accessToken='';
+const BACKEND='https://family-calendar-backend.onrender.com';
+
+let cfg={city:'Oradea'};
 let allEvents=[];
 let calendarList=[];
 let viewDate=new Date();
-let tokenClient=null;
 let isAllDay=false;
 let selectedColorId='2';
 let clickedDate=null;
 let isDemo=false;
+let backendOk=false;
 
 // ── INIT ──
 window.onload=function(){
-  const s=localStorage.getItem('fcfg6');
-  if(s){try{const c=JSON.parse(s);if(c.city)cfg.city=c.city;}catch(e){}}
   hide('setup-cid');
-  const tk=localStorage.getItem('gtoken6');
-  const exp=parseInt(localStorage.getItem('gtoken6_exp')||'0');
-  if(tk&&Date.now()<exp){accessToken=tk;bootDash();}
-  else showLogin();
+  hide('login');
+  checkBackend();
 };
 
 function show(id){document.getElementById(id).classList.remove('gone');}
 function hide(id){document.getElementById(id).classList.add('gone');}
 
-// ── SETUP ──
-function saveCid(){
-  const cid=document.getElementById('i_cid').value.trim();
-  const city=document.getElementById('i_city').value.trim()||'Oradea';
-  if(!cid){alert('Introdu Client ID-ul OAuth.');return;}
-  cfg={clientId:cid,city};
-  localStorage.setItem('fcfg6',JSON.stringify(cfg));
-  hide('setup-cid');showLogin();
-}
-function resetAll(){
-  if(!confirm('Resetezi token-ul de autentificare?'))return;
-  localStorage.removeItem('gtoken6');localStorage.removeItem('gtoken6_exp');
-  location.reload();
-}
-
-// ── LOGIN ──
-// ── LOGIN & TOKEN ──
-function showLogin(){
-  show('login');
-  document.getElementById('dash').style.display='none';
-  waitForGoogle();
-}
-
-function waitForGoogle(){
-  if(!window.google){setTimeout(waitForGoogle,300);return;}
-  tokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:cfg.clientId,
-    scope:'https://www.googleapis.com/auth/calendar',
-    callback:(resp)=>{
-      if(resp.error){
-        // silent refresh failed — show login button only if needed
-        if(resp.error==='interaction_required'||resp.error==='login_required'||resp.error==='access_denied'){
-          show('login');
-          document.getElementById('dash').style.display='none';
-          document.getElementById('login-note').textContent='Apasă butonul pentru a te reconecta.';
-        }
-        return;
-      }
-      accessToken=resp.access_token;
-      const exp=Date.now()+(55*60*1000);
-      localStorage.setItem('gtoken6',accessToken);
-      localStorage.setItem('gtoken6_exp',String(exp));
-      // boot only if not already running
-      if(!document.getElementById('login').classList.contains('gone')){
-        hide('login');bootDash();
-      }
-    }
-  });
-
-  const savedToken=localStorage.getItem('gtoken6');
-  const savedExp=parseInt(localStorage.getItem('gtoken6_exp')||'0');
-
-  if(savedToken&&Date.now()<savedExp-60000){
-    // token valid — use it immediately
-    accessToken=savedToken;
-    hide('login');
-    bootDash();
-    // pre-schedule next refresh
-    const msLeft=savedExp-Date.now()-60000;
-    setTimeout(()=>{if(tokenClient)tokenClient.requestAccessToken({prompt:''});},Math.max(msLeft,1000));
-    return;
-  }
-
-  // token missing or expired — silent re-auth (no popup if user already consented once)
-  if(savedToken){
-    document.getElementById('login-note').textContent='Se reautentifică automat...';
-    tokenClient.requestAccessToken({prompt:''});
-  }
-  // if no token at all — user sees login screen with button
-}
-
-function signIn(){
-  document.getElementById('login-note').textContent='Se deschide fereastra Google...';
-  if(!tokenClient){waitForGoogle();setTimeout(signIn,500);return;}
-  tokenClient.requestAccessToken({prompt:'select_account'});
-}
-
-function silentRefresh(){
-  if(!tokenClient||!cfg.clientId||isDemo)return;
-  tokenClient.requestAccessToken({prompt:''});
-}
-
-function doLogout(){
-  accessToken='';
-  localStorage.removeItem('gtoken6');
-  localStorage.removeItem('gtoken6_exp');
-  allEvents=[];calendarList=[];
-  document.getElementById('dash').style.display='none';
-  showLogin();
-}
-
-function useToken(){
-  const raw=document.getElementById('token-input').value.trim();
-  if(!raw){alert('Lipește tokenul mai întâi.');return;}
-  // accept full JSON or just the token string
-  let token=raw,exp=Date.now()+(55*60*1000);
+async function checkBackend(){
+  setSt('load','Se conecteaza la server...');
   try{
-    const parsed=JSON.parse(raw);
-    if(parsed.token)token=parsed.token;
-    if(parsed.exp)exp=parsed.exp;
-  }catch(e){token=raw;}
-  if(!token.startsWith('ya29.')){alert('Token invalid. Copiază-l din nou din Chrome.');return;}
-  accessToken=token;
-  localStorage.setItem('gtoken6',token);
-  localStorage.setItem('gtoken6_exp',String(exp));
-  hide('login');
-  bootDash();
+    const res=await fetch(BACKEND+'/',{signal:AbortSignal.timeout(10000)});
+    const data=await res.json();
+    if(data.authenticated){
+      backendOk=true;
+      hide('login');
+      bootDash();
+    } else {
+      show('login');
+      document.getElementById('login-note').textContent='Server pornit dar neautentificat.';
+    }
+  }catch(e){
+    setSt('load','Server offline - se reporneste (30s)...');
+    setTimeout(checkBackend,5000);
+  }
 }
 
-function copyToken(){
-  if(!accessToken){alert('Nu ești logat.');return;}
-  const data=JSON.stringify({token:accessToken,exp:parseInt(localStorage.getItem('gtoken6_exp')||'0')});
-  navigator.clipboard.writeText(data).then(()=>{
-    const btn=document.querySelector('.icon-btn[onclick="copyToken()"]');
-    if(btn){const orig=btn.textContent;btn.textContent='✓';setTimeout(()=>btn.textContent=orig,2000);}
-  }).catch(()=>{
-    prompt('Copiază acest token:',data);
-  });
-}
+function resetAll(){if(!confirm('Resetezi?'))return;location.reload();}
 
+function signIn(){window.open(BACKEND+'/auth/login','_blank');}
+function doLogout(){location.reload();}
 function loadDemo(){isDemo=true;hide('login');bootDash(true);}
+function silentRefresh(){}
 
 // ── BOOT ──
 function bootDash(demo=false){
@@ -459,7 +335,6 @@ function bootDash(demo=false){
   tick();setInterval(tick,1000);
   fetchWeather();setInterval(fetchWeather,20*60*1000);
   // auto refresh token every 50 min
-  if(!demo)setInterval(silentRefresh,50*60*1000);
   if(demo){
     allEvents=demoEvs();
     calendarList=[{id:'primary',summary:'Family Calendar'}];
@@ -544,40 +419,21 @@ async function fetchWeather(){
 
 // ── FETCH EVENTS ──
 async function fetchEvents(){
-  if(!accessToken)return;
-  // check if token expired — refresh silently first
-  const exp=parseInt(localStorage.getItem('gtoken6_exp')||'0');
-  if(Date.now()>exp&&!isDemo){silentRefresh();await new Promise(r=>setTimeout(r,2000));}
-  setSt('load','Se actualizează...');
+  if(isDemo)return;
+  setSt('load','Se actualizeaza...');
   try{
-    const h={'Authorization':'Bearer '+accessToken};
     const y=viewDate.getFullYear(),mo=viewDate.getMonth();
-    const tMin=new Date(y,mo-1,1).toISOString();
-    const tMax=new Date(y,mo+2,0,23,59,59).toISOString();
-
-    const cl=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList',{headers:h}).then(r=>r.json());
-    if(cl.error){
-      if(cl.error.code===401){localStorage.removeItem('gtoken6');localStorage.removeItem('gtoken6_exp');accessToken='';showLogin();return;}
-      setSt('err','Eroare: '+cl.error.message);return;
-    }
-    calendarList=cl.items||[];
+    const res=await fetch(BACKEND+'/events?year='+y+'&month='+mo);
+    if(!res.ok){setSt('err','Eroare server '+res.status);return;}
+    const data=await res.json();
+    calendarList=data.calendars||[];
+    allEvents=(data.events||[]).map(ev=>({...ev,_calBg:ev._calBg||'',_calId:ev._calId||'primary'}));
     populateCalSelect();
-
-    allEvents=[];
-    for(const cal of calendarList){
-      try{
-        const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(cal.id)+'/events?timeMin='+tMin+'&timeMax='+tMax+'&singleEvents=true&orderBy=startTime&maxResults=200';
-        const data=await fetch(url,{headers:h}).then(r=>r.json());
-        if(data.items)data.items.forEach(ev=>allEvents.push({...ev,_calBg:cal.backgroundColor||'',_calId:cal.id}));
-      }catch(e){}
-    }
-    allEvents.sort((a,b)=>(a.start?.dateTime||a.start?.date||'').localeCompare(b.start?.dateTime||b.start?.date||''));
     renderGrid();
     const t=new Date().toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
     setSt('ok','Actualizat '+t+' · '+allEvents.length+' ev.');
-  }catch(e){setSt('err','Eroare rețea');}
+  }catch(e){setSt('err','Server offline - se reporneste...');setTimeout(fetchEvents,10000);}
 }
-
 function populateCalSelect(){
   const sel=document.getElementById('ev-cal');
   sel.innerHTML=calendarList.map(c=>`<option value="${esc(c.id)}">${esc(c.summary)}</option>`).join('');
@@ -668,9 +524,8 @@ async function deleteEvent(){
   btn.textContent='Se șterge...';btn.disabled=true;
 
   try{
-    const res=await fetch('https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events/'+encodeURIComponent(evId),{
-      method:'DELETE',
-      headers:{'Authorization':'Bearer '+accessToken}
+    const res=await fetch(BACKEND+'/events/'+encodeURIComponent(calId)+'/'+encodeURIComponent(evId),{
+      method:'DELETE'
     });
     if(res.status===204||res.ok){
       closeModal();await fetchEvents();
@@ -743,12 +598,14 @@ async function saveEvent(){
   }
 
   try{
-    const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events'+(isEdit?'/'+encodeURIComponent(evId):'');
+    const url=isEdit
+      ? BACKEND+'/events/'+encodeURIComponent(calId)+'/'+encodeURIComponent(evId)
+      : BACKEND+'/events';
     const method=isEdit?'PATCH':'POST';
     const res=await fetch(url,{
       method,
-      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
-      body:JSON.stringify(body)
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(isEdit?body:{...body,calendarId:calId})
     });
     if(!res.ok){
       const err=await res.json();
