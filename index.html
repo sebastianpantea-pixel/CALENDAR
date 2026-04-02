@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Family Calendar</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-<!-- OAuth via redirect - no popup needed -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -297,26 +297,10 @@ window.onload=function(){
   const s=localStorage.getItem('fcfg6');
   if(s){try{const c=JSON.parse(s);if(c.city)cfg.city=c.city;}catch(e){}}
   hide('setup-cid');
-
-  // check if returning from OAuth redirect
-  const hash=window.location.hash;
-  if(hash&&hash.includes('access_token')){
-    showLogin(); // handles token extraction + bootDash
-    return;
-  }
-
-  // check saved token
   const tk=localStorage.getItem('gtoken6');
   const exp=parseInt(localStorage.getItem('gtoken6_exp')||'0');
-  if(tk&&Date.now()<exp){
-    accessToken=tk;
-    bootDash();
-    // schedule refresh 2 min before expiry
-    const msLeft=exp-Date.now()-120000;
-    setTimeout(silentRefresh,Math.max(msLeft,5000));
-  } else {
-    showLogin();
-  }
+  if(tk&&Date.now()<exp){accessToken=tk;bootDash();}
+  else showLogin();
 };
 
 function show(id){document.getElementById(id).classList.remove('gone');}
@@ -337,82 +321,71 @@ function resetAll(){
   location.reload();
 }
 
-// ── LOGIN & TOKEN (redirect flow - works in Fully Kiosk) ──
-const REDIRECT_URI=window.location.origin+window.location.pathname;
-const AUTH_URL='https://accounts.google.com/o/oauth2/v2/auth';
-const SCOPE='https://www.googleapis.com/auth/calendar';
-
+// ── LOGIN ──
+// ── LOGIN & TOKEN ──
 function showLogin(){
-  // check if returning from OAuth redirect with token in URL hash
-  const hash=window.location.hash;
-  if(hash&&hash.includes('access_token')){
-    const params=new URLSearchParams(hash.substring(1));
-    const token=params.get('access_token');
-    const expiresIn=parseInt(params.get('expires_in')||'3600');
-    if(token){
-      accessToken=token;
-      const exp=Date.now()+(expiresIn-60)*1000;
-      localStorage.setItem('gtoken6',token);
-      localStorage.setItem('gtoken6_exp',String(exp));
-      // clean URL
-      history.replaceState(null,'',window.location.pathname);
-      hide('login');
-      bootDash();
-      return;
-    }
-  }
   show('login');
   document.getElementById('dash').style.display='none';
+  waitForGoogle();
+}
+
+function waitForGoogle(){
+  if(!window.google){setTimeout(waitForGoogle,300);return;}
+  tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:cfg.clientId,
+    scope:'https://www.googleapis.com/auth/calendar',
+    callback:(resp)=>{
+      if(resp.error){
+        // silent refresh failed — show login button only if needed
+        if(resp.error==='interaction_required'||resp.error==='login_required'||resp.error==='access_denied'){
+          show('login');
+          document.getElementById('dash').style.display='none';
+          document.getElementById('login-note').textContent='Apasă butonul pentru a te reconecta.';
+        }
+        return;
+      }
+      accessToken=resp.access_token;
+      const exp=Date.now()+(55*60*1000);
+      localStorage.setItem('gtoken6',accessToken);
+      localStorage.setItem('gtoken6_exp',String(exp));
+      // boot only if not already running
+      if(!document.getElementById('login').classList.contains('gone')){
+        hide('login');bootDash();
+      }
+    }
+  });
+
+  const savedToken=localStorage.getItem('gtoken6');
+  const savedExp=parseInt(localStorage.getItem('gtoken6_exp')||'0');
+
+  if(savedToken&&Date.now()<savedExp-60000){
+    // token valid — use it immediately
+    accessToken=savedToken;
+    hide('login');
+    bootDash();
+    // pre-schedule next refresh
+    const msLeft=savedExp-Date.now()-60000;
+    setTimeout(()=>{if(tokenClient)tokenClient.requestAccessToken({prompt:''});},Math.max(msLeft,1000));
+    return;
+  }
+
+  // token missing or expired — silent re-auth (no popup if user already consented once)
+  if(savedToken){
+    document.getElementById('login-note').textContent='Se reautentifică automat...';
+    tokenClient.requestAccessToken({prompt:''});
+  }
+  // if no token at all — user sees login screen with button
 }
 
 function signIn(){
-  // redirect to Google — no popup needed
-  const params=new URLSearchParams({
-    client_id:cfg.clientId,
-    redirect_uri:REDIRECT_URI,
-    response_type:'token',
-    scope:SCOPE,
-    include_granted_scopes:'true',
-    prompt:'consent'
-  });
-  window.location.href=AUTH_URL+'?'+params.toString();
+  document.getElementById('login-note').textContent='Se deschide fereastra Google...';
+  if(!tokenClient){waitForGoogle();setTimeout(signIn,500);return;}
+  tokenClient.requestAccessToken({prompt:'select_account'});
 }
 
 function silentRefresh(){
-  // attempt silent token refresh via hidden iframe
-  if(isDemo)return;
-  const exp=parseInt(localStorage.getItem('gtoken6_exp')||'0');
-  if(Date.now()<exp-120000)return; // still valid for >2min, skip
-  // redirect silently if token nearly expired
-  const params=new URLSearchParams({
-    client_id:cfg.clientId,
-    redirect_uri:REDIRECT_URI,
-    response_type:'token',
-    scope:SCOPE,
-    include_granted_scopes:'true',
-    prompt:'none' // no UI shown
-  });
-  const iframe=document.createElement('iframe');
-  iframe.style.display='none';
-  iframe.src=AUTH_URL+'?'+params.toString();
-  iframe.onload=()=>{
-    try{
-      const h=iframe.contentWindow.location.hash;
-      if(h&&h.includes('access_token')){
-        const p=new URLSearchParams(h.substring(1));
-        const tk=p.get('access_token');
-        const ei=parseInt(p.get('expires_in')||'3600');
-        if(tk){
-          accessToken=tk;
-          const ex=Date.now()+(ei-60)*1000;
-          localStorage.setItem('gtoken6',tk);
-          localStorage.setItem('gtoken6_exp',String(ex));
-        }
-      }
-    }catch(e){}
-    document.body.removeChild(iframe);
-  };
-  document.body.appendChild(iframe);
+  if(!tokenClient||!cfg.clientId||isDemo)return;
+  tokenClient.requestAccessToken({prompt:''});
 }
 
 function doLogout(){
