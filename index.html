@@ -622,31 +622,23 @@ async function saveEvent(){
 function chMonth(d){viewDate.setMonth(viewDate.getMonth()+d);fetchEvents();}
 function goToday(){viewDate=new Date();fetchEvents();}
 
-// Google Calendar colorId -> hex
-const GC_COLORS={
-  '1':'#AC725E','2':'#D06B64','3':'#F83A22','4':'#FA573C','5':'#FF7537',
-  '6':'#FFAD46','7':'#42D692','8':'#16A765','9':'#7BD148','10':'#B3DC6C',
-  '11':'#FBE983','1':'#FAD165','2':'#92E1C0','3':'#9FE1E7','4':'#9FC6E7',
-  '5':'#4986E7','6':'#9A9CFF','7':'#B99AFF','8':'#C2C2C2','9':'#CABDBF',
-  '10':'#CCA6AC','11':'#F691B2'
-};
-// Simpler standard mapping
+// Google Calendar colorId -> hex (official Google Calendar colors)
 const GC={
-  '1':'#AC725E','2':'#D06B64','3':'#F83A22','4':'#FA573C',
-  '5':'#FF7537','6':'#FFAD46','7':'#42D692','8':'#16A765',
-  '9':'#7BD148','10':'#B3DC6C','11':'#F691B2'
+  '1':'#a4bdfc','2':'#7ae7bf','3':'#dbadff','4':'#ff887c',
+  '5':'#fbd75b','6':'#ffb878','7':'#46d6db','8':'#e1e1e1',
+  '9':'#5484ed','10':'#51b749','11':'#dc2127'
 };
 
 function getColor(ev){
   if(ev._color)return ev._color;
-  // Google event colorId (set when creating/editing event)
+  // colorId pe eveniment — prioritate maximă
   if(ev.colorId&&GC[ev.colorId])return GC[ev.colorId];
-  // Calendar background color
-  if(ev._calBg&&ev._calBg!=='#039be5'&&ev._calBg!=='#4986e7'&&ev._calBg!=='')return ev._calBg;
+  // culoarea calendarului ca fallback (skip galben default)
+  if(ev._calBg&&ev._calBg!=='#fad165'&&ev._calBg!=='#039be5'&&ev._calBg!=='')return ev._calBg;
   // keyword fallback
   const txt=((ev.summary||'')+(ev.description||'')).toLowerCase();
   for(const[k,v]of Object.entries(KW)){if(txt.includes(k))return v;}
-  return '#4986E7';
+  return '#5484ed';
 }
 function hexRgba(h,a){
   if(!h||h.length<7)return'rgba(160,123,200,'+a+')';
