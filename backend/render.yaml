@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: family-calendar-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: REFRESH_TOKEN
+        sync: false
+      - key: REDIRECT_URI
+        value: https://family-calendar-backend.onrender.com/auth/callback
