@@ -281,7 +281,7 @@ const KW={'sebastian':'#4CAF8A','seb':'#4CAF8A','alina':'#E07070','ali':'#E07070
 const DR=['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
 const MR=['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'];
 
-let cfg={clientId:'',city:'Oradea'};
+let cfg={clientId:'962389587713-9bcdelhudu5oonsfekkn9klv14ba949g.apps.googleusercontent.com',city:'Oradea'};
 let accessToken='';
 let allEvents=[];
 let calendarList=[];
@@ -295,11 +295,11 @@ let isDemo=false;
 // ── INIT ──
 window.onload=function(){
   const s=localStorage.getItem('fcfg6');
-  if(s){try{cfg=JSON.parse(s);}catch(e){}}
-  if(!cfg.clientId){show('setup-cid');return;}
+  if(s){try{const c=JSON.parse(s);if(c.city)cfg.city=c.city;}catch(e){}}
   hide('setup-cid');
   const tk=localStorage.getItem('gtoken6');
-  if(tk){accessToken=tk;bootDash();}
+  const exp=parseInt(localStorage.getItem('gtoken6_exp')||'0');
+  if(tk&&Date.now()<exp){accessToken=tk;bootDash();}
   else showLogin();
 };
 
@@ -316,8 +316,8 @@ function saveCid(){
   hide('setup-cid');showLogin();
 }
 function resetAll(){
-  if(!confirm('Resetezi configurarea?'))return;
-  localStorage.removeItem('fcfg6');localStorage.removeItem('gtoken6');localStorage.removeItem('gtoken6_exp');
+  if(!confirm('Resetezi token-ul de autentificare?'))return;
+  localStorage.removeItem('gtoken6');localStorage.removeItem('gtoken6_exp');
   location.reload();
 }
 
