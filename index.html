@@ -51,48 +51,50 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 /* ── DASHBOARD ── */
 #dash{height:100vh;display:none;flex-direction:column;}
 .topbar{display:flex;align-items:stretch;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface);}
-.clock-block{padding:12px 20px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border);}
-.clock{font-family:'DM Serif Display',serif;font-size:46px;line-height:1;letter-spacing:-2px;}
-.date-sub{font-size:11px;color:var(--txt2);margin-top:3px;text-transform:capitalize;}
-.weather-block{padding:10px 16px;display:flex;gap:12px;align-items:center;border-right:1px solid var(--border);}
-.ws{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:42px;}
-.wl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.07em;font-weight:500;}
-.wi{font-size:18px;line-height:1;}
-.wt{font-size:13px;font-weight:500;}
+.clock-block{padding:6px 12px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border);flex-shrink:0;}
+.clock{font-family:'DM Serif Display',serif;font-size:34px;line-height:1;letter-spacing:-1px;}
+.date-sub{font-size:9px;color:var(--txt2);margin-top:2px;text-transform:capitalize;white-space:nowrap;}
+.weather-block{padding:6px 8px;display:flex;gap:6px;align-items:center;border-right:1px solid var(--border);flex-shrink:0;}
+.ws{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:30px;}
+.wl{font-size:7px;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;font-weight:500;}
+.wi{font-size:14px;line-height:1;}
+.wt{font-size:11px;font-weight:500;}
 .wdiv{width:1px;background:var(--border);align-self:stretch;}
-.header-right{flex:1;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:10px;}
-.month-nav{display:flex;align-items:center;gap:8px;}
-.month-title{font-family:'DM Serif Display',serif;font-size:20px;text-transform:capitalize;min-width:150px;}
-.nav-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.header-right{flex:1;display:flex;align-items:center;justify-content:space-between;padding:6px 10px;gap:8px;min-width:0;overflow:hidden;}
+.month-nav{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.month-title{font-family:'DM Serif Display',serif;font-size:16px;text-transform:capitalize;white-space:nowrap;}
+.nav-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-btn:hover{background:var(--surface2);}
-.today-btn{padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;}
+.today-btn{padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:'Inter',sans-serif;font-size:10px;cursor:pointer;flex-shrink:0;}
 .today-btn:hover{background:var(--surface2);}
 
 /* ADD EVENT BUTTON */
-.add-btn{padding:8px 16px;border-radius:9px;background:var(--seb);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity .15s;}
+.add-btn{padding:6px 11px;border-radius:7px;background:var(--seb);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;transition:opacity .15s;flex-shrink:0;white-space:nowrap;}
 .add-btn:hover{opacity:.85;}
-.add-btn svg{width:14px;height:14px;}
+.add-btn svg{width:11px;height:11px;}
 
-.status-area{display:flex;align-items:center;gap:5px;flex-shrink:0;}
-.s-dot{width:7px;height:7px;border-radius:50%;background:#E09C50;}
-.s-txt{font-size:11px;color:var(--txt3);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.icon-btn{width:27px;height:27px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.status-area{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.s-dot{width:6px;height:6px;border-radius:50%;background:#E09C50;flex-shrink:0;}
+.s-txt{font-size:9px;color:var(--txt3);max-width:70px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.icon-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--txt3);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .icon-btn:hover{color:var(--txt2);background:var(--surface2);}
+.fs-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--txt3);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fs-btn:hover{color:var(--txt2);background:var(--surface2);}
 
 /* ── CALENDAR GRID ── */
-.cal-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:0 10px 8px;}
-.weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:6px 0 4px;}
-.wday{text-align:center;font-size:10px;font-weight:500;color:var(--txt3);letter-spacing:.06em;text-transform:uppercase;}
+.cal-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:0 6px 6px;}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:4px 0 3px;}
+.wday{text-align:center;font-size:9px;font-weight:500;color:var(--txt3);letter-spacing:.05em;text-transform:uppercase;}
 .month-grid{flex:1;display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;gap:2px;}
-.dc{background:var(--surface);border-radius:7px;padding:5px 6px;display:flex;flex-direction:column;gap:2px;overflow:hidden;border:1px solid transparent;cursor:pointer;transition:border-color .15s;}
+.dc{background:var(--surface);border-radius:5px;padding:3px 5px;display:flex;flex-direction:column;gap:2px;overflow:hidden;border:1px solid transparent;cursor:pointer;transition:border-color .15s;}
 .dc:hover:not(.other){border-color:var(--border);}
 .dc.other{background:var(--bg);opacity:.35;cursor:default;}
 .dc.today{border-color:var(--today-ring);}
-.dn{font-size:11px;font-weight:500;color:var(--txt2);width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:5px;}
+.dn{font-size:10px;font-weight:500;color:var(--txt2);width:17px;height:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:4px;}
 .dc.today .dn{background:var(--today-bg);color:#fff;}
-.chip{border-radius:4px;padding:1px 5px;font-size:10px;font-weight:500;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:3px;flex-shrink:0;}
-.chip-time{opacity:.65;font-size:9px;font-weight:400;flex-shrink:0;}
-.more{font-size:9px;color:var(--txt3);padding-left:2px;}
+.chip{border-radius:3px;padding:1px 4px;font-size:9px;font-weight:500;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:2px;flex-shrink:0;}
+.chip-time{opacity:.65;font-size:8px;font-weight:400;flex-shrink:0;}
+.more{font-size:8px;color:var(--txt3);padding-left:1px;}
 
 /* ── ADD EVENT MODAL ── */
 #modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
@@ -119,9 +121,7 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 .toggle.on::after{transform:translateX(16px);}
 .all-day-lbl{font-size:13px;color:var(--txt2);}
 
-/* FULLSCREEN BTN */
-.fs-btn{width:27px;height:27px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt3);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.fs-btn:hover{color:var(--txt2);background:var(--surface2);}
+/* FULLSCREEN BTN - defined above in status-area */
 
 @keyframes fi{from{opacity:0}to{opacity:1}}
 .fi{animation:fi .2s ease;}
