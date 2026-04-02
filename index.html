@@ -5,201 +5,154 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Family Calendar</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#0F1117;--surface:#181B23;--surface2:#1E2230;--border:#2A2E3E;
   --txt:#F0EDE8;--txt2:#9A95A0;--txt3:#5A5660;
   --seb:#4CAF8A;--ali:#E07070;--fiu:#6B9FD4;--fam:#A07BC8;
-  --today-bg:#2D6A4F;--today-ring:#4CAF8A;
-  --r:10px;
+  --today-ring:#4CAF8A;--today-bg:#2D6A4F;
 }
 html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:var(--txt);overflow:hidden;}
 
-/* ── SETUP ── */
-#setup{position:fixed;inset:0;background:rgba(15,17,23,.97);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;}
-#setup.gone{display:none;}
-.setup-box{background:var(--surface);border-radius:20px;border:1px solid var(--border);padding:32px;width:100%;max-width:420px;}
-.setup-title{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:6px;color:var(--txt);}
-.setup-sub{font-size:13px;color:var(--txt2);margin-bottom:24px;line-height:1.6;}
-.step{display:none;} .step.active{display:block;}
-.sdots{display:flex;gap:6px;margin-bottom:22px;}
-.sdot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:background .3s;}
-.sdot.on{background:var(--seb);}
-.lbl{font-size:11px;font-weight:500;color:var(--txt2);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:7px;}
-.inp{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;color:var(--txt);background:var(--bg);outline:none;transition:border-color .2s;}
+#setup-cid{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;}
+#setup-cid.gone,#login.gone{display:none;}
+#login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200;}
+
+.box{background:var(--surface);border-radius:22px;border:1px solid var(--border);padding:36px 32px;width:100%;max-width:440px;}
+.box-title{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:6px;}
+.box-sub{font-size:13px;color:var(--txt2);margin-bottom:22px;line-height:1.55;}
+.lbl{font-size:11px;font-weight:500;color:var(--txt2);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;}
+.inp{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;color:var(--txt);background:var(--bg);outline:none;transition:border-color .2s;margin-bottom:4px;}
 .inp:focus{border-color:var(--seb);}
-.hint{font-size:11px;color:var(--txt3);margin-top:5px;line-height:1.5;}
+.hint{font-size:11px;color:var(--txt3);margin-bottom:14px;line-height:1.5;}
 .hint a{color:var(--seb);text-decoration:none;}
-.steps{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
-.step-r{display:flex;align-items:flex-start;gap:11px;}
-.step-n{width:22px;height:22px;border-radius:50%;background:var(--seb);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
-.step-t{font-size:12px;color:var(--txt2);line-height:1.5;}
-.step-t a{color:var(--seb);text-decoration:none;} .step-t strong{color:var(--txt);font-weight:500;}
-.nav-row{display:flex;gap:9px;margin-top:18px;}
-.btn-p{flex:1;padding:12px;background:var(--seb);color:#fff;border:none;border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .2s;}
+.btn-p{width:100%;padding:12px;background:var(--seb);color:#fff;border:none;border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;}
 .btn-p:hover{opacity:.85;}
-.btn-s{padding:12px 16px;background:transparent;color:var(--txt2);border:1.5px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;}
-.btn-s:hover{border-color:var(--txt3);}
-.btn-demo{width:100%;padding:10px;background:transparent;color:var(--txt3);border:1px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;margin-top:10px;}
+.steps-mini{display:flex;flex-direction:column;gap:9px;margin-bottom:20px;}
+.sr{display:flex;align-items:flex-start;gap:10px;}
+.sn{width:21px;height:21px;border-radius:50%;background:var(--seb);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.st{font-size:12px;color:var(--txt2);line-height:1.5;}
+.st strong{color:var(--txt);font-weight:500;}
+.st a{color:var(--seb);text-decoration:none;}
+
+.login-icon{font-size:50px;margin-bottom:16px;text-align:center;}
+.login-title{font-family:'DM Serif Display',serif;font-size:26px;text-align:center;margin-bottom:8px;}
+.login-sub{font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:28px;text-align:center;}
+.google-btn{width:100%;padding:13px 16px;background:#fff;color:#3c4043;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;}
+.google-btn:hover{opacity:.9;}
+.btn-demo{width:100%;padding:10px;background:transparent;color:var(--txt3);border:1px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;}
 .btn-demo:hover{color:var(--txt2);}
-.field{margin-bottom:14px;}
+.login-note{font-size:11px;color:var(--txt3);text-align:center;margin-top:10px;min-height:16px;}
 
-/* ── DASHBOARD ── */
 #dash{height:100vh;display:none;flex-direction:column;}
-
-/* TOP BAR */
-.topbar{display:flex;align-items:stretch;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface);}
-
-.clock-block{padding:16px 28px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border);}
-.clock{font-family:'DM Serif Display',serif;font-size:52px;line-height:1;letter-spacing:-2px;color:var(--txt);}
-.date-sub{font-size:12px;color:var(--txt2);margin-top:4px;text-transform:capitalize;letter-spacing:.01em;}
-
-.weather-block{padding:14px 24px;display:flex;gap:20px;align-items:center;border-right:1px solid var(--border);}
-.w-slot{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:52px;}
-.w-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.07em;font-weight:500;}
-.w-icon{font-size:22px;line-height:1;}
-.w-temp{font-size:16px;font-weight:500;color:var(--txt);}
-.w-divider{width:1px;background:var(--border);align-self:stretch;}
-
-.header-right{flex:1;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;}
-.month-nav{display:flex;align-items:center;gap:14px;}
-.month-title{font-family:'DM Serif Display',serif;font-size:24px;color:var(--txt);text-transform:capitalize;}
-.nav-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.topbar{display:flex;align-items:stretch;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface);}
+.clock-block{padding:14px 22px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border);}
+.clock{font-family:'DM Serif Display',serif;font-size:48px;line-height:1;letter-spacing:-2px;}
+.date-sub{font-size:12px;color:var(--txt2);margin-top:3px;text-transform:capitalize;}
+.weather-block{padding:10px 18px;display:flex;gap:14px;align-items:center;border-right:1px solid var(--border);}
+.ws{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:44px;}
+.wl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.07em;font-weight:500;}
+.wi{font-size:19px;line-height:1;}
+.wt{font-size:14px;font-weight:500;}
+.wdiv{width:1px;background:var(--border);align-self:stretch;}
+.header-right{flex:1;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;gap:10px;}
+.month-nav{display:flex;align-items:center;gap:9px;}
+.month-title{font-family:'DM Serif Display',serif;font-size:21px;text-transform:capitalize;min-width:160px;}
+.nav-btn{width:29px;height:29px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .nav-btn:hover{background:var(--surface2);}
-.today-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:background .15s;}
+.today-btn{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;}
 .today-btn:hover{background:var(--surface2);}
-
-.legend{display:flex;gap:14px;align-items:center;}
-.leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--txt2);}
-.leg-dot{width:8px;height:8px;border-radius:50%;}
-
-.status-area{display:flex;align-items:center;gap:8px;}
+.legend{display:flex;gap:11px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2);}
+.leg-dot{width:7px;height:7px;border-radius:50%;}
+.status-area{display:flex;align-items:center;gap:5px;flex-shrink:0;}
 .s-dot{width:7px;height:7px;border-radius:50%;background:#E09C50;}
-.s-txt{font-size:11px;color:var(--txt3);}
-.refresh-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--txt3);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.refresh-btn:hover{color:var(--txt2);background:var(--surface2);}
+.s-txt{font-size:11px;color:var(--txt3);max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.icon-btn{width:27px;height:27px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.icon-btn:hover{color:var(--txt2);background:var(--surface2);}
 
-/* ── CALENDAR GRID ── */
-.cal-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:0 16px 12px;}
-
-.weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:10px 0 6px;}
-.wd{text-align:center;font-size:11px;font-weight:500;color:var(--txt3);letter-spacing:.06em;text-transform:uppercase;}
-
+.cal-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:0 12px 10px;}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:7px 0 4px;}
+.wday{text-align:center;font-size:10px;font-weight:500;color:var(--txt3);letter-spacing:.06em;text-transform:uppercase;}
 .month-grid{flex:1;display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;gap:2px;}
-
-.day-cell{background:var(--surface);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:3px;overflow:hidden;position:relative;border:1px solid transparent;transition:border-color .15s;}
-.day-cell.other-month{background:var(--bg);opacity:.5;}
-.day-cell.today{border-color:var(--today-ring);}
-.day-cell.today .day-num{background:var(--today-bg);color:#fff;border-radius:6px;}
-
-.day-num{font-size:12px;font-weight:500;color:var(--txt2);width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.day-cell.today .day-num{color:#fff;}
-.other-month .day-num{color:var(--txt3);}
-
-.ev-chip{border-radius:5px;padding:2px 6px;font-size:10px;font-weight:500;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px;flex-shrink:0;}
-.ev-chip-time{opacity:.7;font-weight:400;font-size:9px;flex-shrink:0;}
-.more-badge{font-size:9px;color:var(--txt3);padding:1px 4px;font-weight:500;}
-
-/* ── ANIM ── */
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.fade-in{animation:fadeIn .2s ease;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinning{animation:spin .7s linear infinite;display:inline-block;}
+.dc{background:var(--surface);border-radius:7px;padding:5px 6px;display:flex;flex-direction:column;gap:2px;overflow:hidden;border:1px solid transparent;}
+.dc.other{background:var(--bg);opacity:.35;}
+.dc.today{border-color:var(--today-ring);}
+.dn{font-size:11px;font-weight:500;color:var(--txt2);width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:5px;}
+.dc.today .dn{background:var(--today-bg);color:#fff;}
+.chip{border-radius:4px;padding:1px 5px;font-size:10px;font-weight:500;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.chip-time{opacity:.65;font-size:9px;font-weight:400;flex-shrink:0;}
+.more{font-size:9px;color:var(--txt3);padding-left:2px;}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.fi{animation:fi .2s ease;}
 </style>
 </head>
 <body>
 
-<!-- SETUP -->
-<div id="setup">
-<div class="setup-box">
-  <div class="setup-title">📅 Family Calendar</div>
-  <div class="setup-sub">Configurare rapidă — 2 pași simpli.</div>
-  <div class="sdots"><div class="sdot on" id="d0"></div><div class="sdot" id="d1"></div></div>
-
-  <div class="step active" id="s0">
-    <div class="steps">
-      <div class="step-r"><div class="step-n">1</div><div class="step-t">Deschide <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> și loghează-te cu contul Google</div></div>
-      <div class="step-r"><div class="step-n">2</div><div class="step-t">Click <strong>Select a project → New Project</strong>, dă un nume, <strong>Create</strong></div></div>
-      <div class="step-r"><div class="step-n">3</div><div class="step-t"><strong>APIs &amp; Services → Enable APIs</strong> → caută <strong>Google Calendar API → Enable</strong></div></div>
-      <div class="step-r"><div class="step-n">4</div><div class="step-t"><strong>Credentials → + Create Credentials → API Key</strong> → copiaz-o jos</div></div>
-    </div>
-    <div class="field">
-      <label class="lbl">API Key Google Calendar</label>
-      <input class="inp" id="i_key" type="password" placeholder="AIzaSy...">
-      <div class="hint">Salvată local pe tabletă. Nu se trimite nicăieri.</div>
-    </div>
-    <div class="nav-row"><button class="btn-p" onclick="goS1()">Înainte →</button></div>
-    <button class="btn-demo" onclick="loadDemo()">✦ Încearcă în mod demo (fără API key)</button>
+<!-- STEP 1: SETUP CLIENT ID -->
+<div id="setup-cid">
+<div class="box">
+  <div class="box-title">📅 Configurare inițială</div>
+  <div class="box-sub">O singură dată. Calendarul rămâne 100% privat.</div>
+  <div class="steps-mini">
+    <div class="sr"><div class="sn">1</div><div class="st">Mergi la <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud → Credentials</a></div></div>
+    <div class="sr"><div class="sn">2</div><div class="st">Click pe OAuth client <strong>"calendar"</strong> → <strong>Authorized JavaScript origins</strong> → Add URI:<br><strong style="color:var(--seb);">https://sebastianpantea-pixel.github.io</strong> → Save</div></div>
+    <div class="sr"><div class="sn">3</div><div class="st">Copiază <strong>Client ID</strong> din dreapta și introdu-l jos</div></div>
   </div>
+  <label class="lbl">OAuth Client ID</label>
+  <input class="inp" id="i_cid" placeholder="962389587713-xxx.apps.googleusercontent.com">
+  <div class="hint">Google Cloud → Credentials → clientul "calendar" → Client ID (dreapta paginii)</div>
+  <label class="lbl">Oraș (vreme)</label>
+  <input class="inp" id="i_city" value="Oradea">
+  <div class="hint" style="margin-bottom:18px;">Pentru prognoza meteo</div>
+  <button class="btn-p" onclick="saveCid()">Salvează și continuă →</button>
+</div>
+</div>
 
-  <div class="step" id="s1">
-    <div class="field">
-      <label class="lbl">Calendar ID (Family)</label>
-      <input class="inp" id="i_cal" placeholder="sebastian.pantea@gmail.com" value="sebastian.pantea@gmail.com">
-      <div class="hint">Dacă calendarul "Family" e pe contul tău, ID = emailul tău Gmail.<br>Altfel: Google Calendar → ⚙ lângă calendar → <strong>Settings → Calendar ID</strong></div>
-    </div>
-    <div class="field">
-      <label class="lbl">Oraș (vreme)</label>
-      <input class="inp" id="i_city" placeholder="Oradea" value="Oradea">
-    </div>
-    <div class="nav-row">
-      <button class="btn-s" onclick="goS0()">← Înapoi</button>
-      <button class="btn-p" onclick="saveStart()">Pornește 🚀</button>
-    </div>
-  </div>
+<!-- STEP 2: LOGIN -->
+<div id="login" class="gone">
+<div class="box" style="max-width:340px;margin:auto;text-align:center;">
+  <div class="login-icon">📅</div>
+  <div class="login-title">Family Calendar</div>
+  <div class="login-sub">Loghează-te cu Google pentru a accesa calendarul.<br>Datele rămân <strong style="color:var(--seb);">100% private</strong>.</div>
+  <button class="google-btn" onclick="signIn()">
+    <svg width="20" height="20" viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+    </svg>
+    Continuă cu Google
+  </button>
+  <button class="btn-demo" onclick="loadDemo()">✦ Mod demo (fără login)</button>
+  <div class="login-note" id="login-note"></div>
 </div>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dash">
-
   <div class="topbar">
-
-    <!-- CLOCK -->
     <div class="clock-block">
       <div class="clock" id="clk">--:--</div>
-      <div class="date-sub" id="date-sub">—</div>
+      <div class="date-sub" id="dsub">—</div>
     </div>
-
-    <!-- WEATHER -->
-    <div class="weather-block" id="wx-block">
-      <div class="w-slot">
-        <div class="w-label">Acum</div>
-        <div class="w-icon" id="wx0">🌤</div>
-        <div class="w-temp" id="wt0">--°</div>
-      </div>
-      <div class="w-divider"></div>
-      <div class="w-slot">
-        <div class="w-label">Seară</div>
-        <div class="w-icon" id="wx1">🌤</div>
-        <div class="w-temp" id="wt1">--°</div>
-      </div>
-      <div class="w-divider"></div>
-      <div class="w-slot">
-        <div class="w-label">Noapte</div>
-        <div class="w-icon" id="wx2">🌙</div>
-        <div class="w-temp" id="wt2">--°</div>
-      </div>
-      <div class="w-divider"></div>
-      <div class="w-slot">
-        <div class="w-label">Dimineață</div>
-        <div class="w-icon" id="wx3">🌤</div>
-        <div class="w-temp" id="wt3">--°</div>
-      </div>
-      <div class="w-divider"></div>
-      <div class="w-slot">
-        <div class="w-label">Amiază</div>
-        <div class="w-icon" id="wx4">🌤</div>
-        <div class="w-temp" id="wt4">--°</div>
-      </div>
+    <div class="weather-block">
+      <div class="ws"><div class="wl">Acum</div><div class="wi" id="wx0">🌤</div><div class="wt" id="wt0">--°</div></div>
+      <div class="wdiv"></div>
+      <div class="ws"><div class="wl">Seară</div><div class="wi" id="wx1">🌤</div><div class="wt" id="wt1">--°</div></div>
+      <div class="wdiv"></div>
+      <div class="ws"><div class="wl">Noapte</div><div class="wi" id="wx2">🌙</div><div class="wt" id="wt2">--°</div></div>
+      <div class="wdiv"></div>
+      <div class="ws"><div class="wl">Dimineață</div><div class="wi" id="wx3">🌤</div><div class="wt" id="wt3">--°</div></div>
+      <div class="wdiv"></div>
+      <div class="ws"><div class="wl">Amiază</div><div class="wi" id="wx4">🌤</div><div class="wt" id="wt4">--°</div></div>
     </div>
-
-    <!-- RIGHT HEADER -->
     <div class="header-right">
       <div class="month-nav">
         <button class="nav-btn" onclick="chMonth(-1)">‹</button>
-        <div class="month-title" id="month-lbl">—</div>
+        <div class="month-title" id="mlbl">—</div>
         <button class="nav-btn" onclick="chMonth(1)">›</button>
         <button class="today-btn" onclick="goToday()">Azi</button>
       </div>
@@ -212,276 +165,271 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
       <div class="status-area">
         <div class="s-dot" id="sdot"></div>
         <div class="s-txt" id="stxt">—</div>
-        <button class="refresh-btn" title="Actualizează" onclick="doRefresh()">↻</button>
-        <button class="refresh-btn" title="Setări" onclick="resetCfg()" style="font-size:12px;">⚙</button>
+        <button class="icon-btn" onclick="fetchEvents()" title="Actualizează">↻</button>
+        <button class="icon-btn" onclick="doLogout()" title="Logout" style="font-size:10px;">⏏</button>
+        <button class="icon-btn" onclick="resetAll()" title="Resetează configurarea">⚙</button>
       </div>
     </div>
   </div>
-
-  <!-- GRID -->
   <div class="cal-wrap">
     <div class="weekdays">
-      <div class="wd">Lun</div><div class="wd">Mar</div><div class="wd">Mie</div>
-      <div class="wd">Joi</div><div class="wd">Vin</div><div class="wd">Sâm</div><div class="wd">Dum</div>
+      <div class="wday">Lun</div><div class="wday">Mar</div><div class="wday">Mie</div>
+      <div class="wday">Joi</div><div class="wday">Vin</div><div class="wday">Sâm</div><div class="wday">Dum</div>
     </div>
     <div class="month-grid" id="grid"></div>
   </div>
-
 </div>
 
 <script>
-// ── WEATHER MAPS ──
 const WC={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',61:'🌧',63:'🌧',65:'🌧',71:'🌨',73:'🌨',75:'❄️',80:'🌦',81:'🌧',82:'⛈',95:'⛈',99:'⛈'};
+const KW={'sebastian':'#4CAF8A','seb':'#4CAF8A','alina':'#E07070','ali':'#E07070','fiul':'#6B9FD4','baiat':'#6B9FD4'};
+const DR=['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
+const MR=['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'];
 
-// ── MEMBER DETECTION ──
-const KW={'sebastian':'#4CAF8A','seb':'#4CAF8A','alina':'#E07070','ali':'#E07070','fiul':'#6B9FD4','baiat':'#6B9FD4','copil':'#6B9FD4'};
-const CN={'#4CAF8A':'Sebastian','#E07070':'Alina','#6B9FD4':'Fiul','#A07BC8':'Familie'};
-// Google colorId → member color (approximate)
-const GCO={'1':'#E07070','2':'#4CAF8A','3':'#4CAF8A','4':'#6B9FD4','5':'#A07BC8','6':'#E07070','7':'#4CAF8A','8':'#A07BC8','9':'#6B9FD4','10':'#4CAF8A','11':'#A07BC8'};
-
-function getMemberColor(ev){
-  const txt=((ev.summary||'')+(ev.description||'')).toLowerCase();
-  for(const[k,v]of Object.entries(KW)){if(txt.includes(k))return v;}
-  if(ev.colorId&&GCO[ev.colorId])return GCO[ev.colorId];
-  return '#A07BC8';
-}
-function hexToRgba(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${a})`;}
-
-// ── STATE ──
-let cfg={apiKey:'',calId:'sebastian.pantea@gmail.com',city:'Oradea',demo:false};
+let cfg={clientId:'',city:'Oradea'};
+let accessToken='';
 let allEvents=[];
 let viewDate=new Date();
-
-// ── SETUP ──
-function goS1(){
-  const k=document.getElementById('i_key').value.trim();
-  if(!k){alert('Introdu API Key-ul Google.');return;}
-  ['s0','s1'].forEach((id,i)=>document.getElementById(id).classList.toggle('active',i===1));
-  document.getElementById('d0').classList.remove('on');document.getElementById('d1').classList.add('on');
-}
-function goS0(){
-  ['s0','s1'].forEach((id,i)=>document.getElementById(id).classList.toggle('active',i===0));
-  document.getElementById('d1').classList.remove('on');document.getElementById('d0').classList.add('on');
-}
-function saveStart(){
-  const calId=document.getElementById('i_cal').value.trim()||'sebastian.pantea@gmail.com';
-  const city=document.getElementById('i_city').value.trim()||'Oradea';
-  const apiKey=document.getElementById('i_key').value.trim();
-  if(!calId){alert('Introdu Calendar ID.');return;}
-  cfg={apiKey,calId,city,demo:false};
-  localStorage.setItem('fcfg3',JSON.stringify(cfg));
-  boot();
-}
-function loadDemo(){cfg={apiKey:'',calId:'demo',city:'Oradea',demo:true};boot();}
-function resetCfg(){localStorage.removeItem('fcfg3');document.getElementById('dash').style.display='none';document.getElementById('setup').classList.remove('gone');}
+let tokenClient=null;
 
 window.onload=function(){
-  const s=localStorage.getItem('fcfg3');
-  if(s){try{cfg=JSON.parse(s);boot();return;}catch(e){}}
+  const s=localStorage.getItem('fcfg4');
+  if(s){try{cfg=JSON.parse(s);}catch(e){}}
+  if(!cfg.clientId){show('setup-cid');return;}
+  hide('setup-cid');
+  const tk=sessionStorage.getItem('gtoken');
+  if(tk){accessToken=tk;bootDash();}
+  else showLogin();
 };
 
-// ── BOOT ──
-function boot(){
-  document.getElementById('setup').classList.add('gone');
+function show(id){document.getElementById(id).classList.remove('gone');}
+function hide(id){document.getElementById(id).classList.add('gone');}
+
+function saveCid(){
+  const cid=document.getElementById('i_cid').value.trim();
+  const city=document.getElementById('i_city').value.trim()||'Oradea';
+  if(!cid){alert('Introdu Client ID-ul OAuth.');return;}
+  cfg={clientId:cid,city};
+  localStorage.setItem('fcfg4',JSON.stringify(cfg));
+  hide('setup-cid');showLogin();
+}
+
+function resetAll(){
+  if(!confirm('Resetezi configurarea?'))return;
+  localStorage.removeItem('fcfg4');sessionStorage.removeItem('gtoken');
+  location.reload();
+}
+
+function showLogin(){
+  show('login');
+  document.getElementById('dash').style.display='none';
+  waitForGoogle();
+}
+
+function waitForGoogle(){
+  if(!window.google){setTimeout(waitForGoogle,300);return;}
+  tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:cfg.clientId,
+    scope:'https://www.googleapis.com/auth/calendar.readonly',
+    callback:(resp)=>{
+      if(resp.error){document.getElementById('login-note').textContent='Eroare: '+resp.error;return;}
+      accessToken=resp.access_token;
+      sessionStorage.setItem('gtoken',accessToken);
+      hide('login');bootDash();
+    }
+  });
+}
+
+function signIn(){
+  document.getElementById('login-note').textContent='Se deschide fereastra Google...';
+  if(!tokenClient){waitForGoogle();setTimeout(signIn,500);return;}
+  tokenClient.requestAccessToken({prompt:''});
+}
+
+function doLogout(){
+  accessToken='';sessionStorage.removeItem('gtoken');allEvents=[];
+  document.getElementById('dash').style.display='none';
+  showLogin();
+}
+
+function loadDemo(){hide('login');bootDash(true);}
+
+function bootDash(demo=false){
   document.getElementById('dash').style.display='flex';
   tick();setInterval(tick,1000);
   fetchWeather();setInterval(fetchWeather,20*60*1000);
-  fetchEvents();setInterval(fetchEvents,5*60*1000);
+  if(demo){allEvents=demoEvs();renderGrid();setSt('ok','Mod demo · '+allEvents.length+' ev.');}
+  else{fetchEvents();setInterval(fetchEvents,5*60*1000);}
 }
 
-// ── CLOCK ──
-const DR=['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
-const MR=['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'];
 function tick(){
   const n=new Date();
-  document.getElementById('clk').textContent=`${pad(n.getHours())}:${pad(n.getMinutes())}`;
-  document.getElementById('date-sub').textContent=`${DR[n.getDay()]}, ${n.getDate()} ${MR[n.getMonth()]} ${n.getFullYear()}`;
+  document.getElementById('clk').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
+  document.getElementById('dsub').textContent=DR[n.getDay()]+', '+n.getDate()+' '+MR[n.getMonth()]+' '+n.getFullYear();
 }
 function pad(x){return String(x).padStart(2,'0');}
 
-// ── WEATHER ── (5 slots: now / evening / night / tomorrow morning / tomorrow afternoon)
 async function fetchWeather(){
   try{
-    const g=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cfg.city)}&count=1&format=json`).then(r=>r.json());
+    const g=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(cfg.city)+'&count=1&format=json').then(r=>r.json());
     if(!g.results?.length)return;
     const{latitude,longitude}=g.results[0];
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode&current_weather=true&timezone=Europe/Bucharest&forecast_days=2`;
-    const d=await fetch(url).then(r=>r.json());
+    const d=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+latitude+'&longitude='+longitude+'&hourly=temperature_2m,weathercode&current_weather=true&timezone=Europe/Bucharest&forecast_days=2').then(r=>r.json());
     const cw=d.current_weather;
-    const hours=d.hourly.time.map(t=>new Date(t));
-    const temps=d.hourly.temperature_2m;
-    const codes=d.hourly.weathercode;
-    function getSlot(targetH,offset=0){
-      const base=new Date();base.setDate(base.getDate()+offset);base.setHours(targetH,0,0,0);
-      let best=0,min=Infinity;
-      hours.forEach((h,i)=>{const diff=Math.abs(h-base);if(diff<min){min=diff;best=i;}});
-      return{temp:Math.round(temps[best]),code:codes[best]};
+    const hrs=d.hourly.time.map(t=>new Date(t));
+    const tmp=d.hourly.temperature_2m,cds=d.hourly.weathercode;
+    function slot(h,off){
+      const b=new Date();b.setDate(b.getDate()+off);b.setHours(h,0,0,0);
+      let bi=0,mn=Infinity;
+      hrs.forEach((x,i)=>{const df=Math.abs(x-b);if(df<mn){mn=df;bi=i;}});
+      return{t:Math.round(tmp[bi]),c:cds[bi]};
     }
-    // now
-    document.getElementById('wx0').textContent=WC[cw.weathercode]||'🌡';
-    document.getElementById('wt0').textContent=`${Math.round(cw.temperature)}°`;
-    // evening ~19h today
-    const eve=getSlot(19,0);document.getElementById('wx1').textContent=WC[eve.code]||'🌤';document.getElementById('wt1').textContent=`${eve.temp}°`;
-    // night ~01h tomorrow
-    const ngt=getSlot(1,1);document.getElementById('wx2').textContent=WC[ngt.code]||'🌙';document.getElementById('wt2').textContent=`${ngt.temp}°`;
-    // tomorrow morning ~08h
-    const mrn=getSlot(8,1);document.getElementById('wx3').textContent=WC[mrn.code]||'🌤';document.getElementById('wt3').textContent=`${mrn.temp}°`;
-    // tomorrow afternoon ~14h
-    const aft=getSlot(14,1);document.getElementById('wx4').textContent=WC[aft.code]||'🌤';document.getElementById('wt4').textContent=`${aft.temp}°`;
-  }catch(e){console.warn('weather err',e);}
+    const sets=[{t:Math.round(cw.temperature),c:cw.weathercode},slot(19,0),slot(1,1),slot(8,1),slot(14,1)];
+    sets.forEach((s,i)=>{
+      document.getElementById('wx'+i).textContent=WC[s.c]||'🌡';
+      document.getElementById('wt'+i).textContent=s.t+'°';
+    });
+  }catch(e){console.warn('weather',e);}
 }
 
-// ── EVENTS ──
 async function fetchEvents(){
+  if(!accessToken)return;
   setSt('load','Se actualizează...');
-  if(cfg.demo){allEvents=demoEvs();renderGrid();setSt('ok',`Demo · ${allEvents.length} ev.`);return;}
   try{
+    const h={'Authorization':'Bearer '+accessToken};
     const y=viewDate.getFullYear(),mo=viewDate.getMonth();
-    const s=new Date(y,mo-1,1).toISOString();
-    const e=new Date(y,mo+2,0,23,59,59).toISOString();
-    const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cfg.calId)}/events?key=${cfg.apiKey}&timeMin=${s}&timeMax=${e}&singleEvents=true&orderBy=startTime&maxResults=200`;
-    const res=await fetch(url);
-    if(!res.ok){const err=await res.json();setSt('err',`Eroare: ${err.error?.message||res.status}`);return;}
-    const data=await res.json();
-    allEvents=(data.items||[]);
+    const tMin=new Date(y,mo-1,1).toISOString();
+    const tMax=new Date(y,mo+2,0,23,59,59).toISOString();
+
+    const cl=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList',{headers:h}).then(r=>r.json());
+    if(cl.error){
+      if(cl.error.code===401){sessionStorage.removeItem('gtoken');accessToken='';showLogin();return;}
+      setSt('err','Eroare API: '+cl.error.message);return;
+    }
+
+    allEvents=[];
+    for(const cal of(cl.items||[])){
+      try{
+        const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(cal.id)+'/events?timeMin='+tMin+'&timeMax='+tMax+'&singleEvents=true&orderBy=startTime&maxResults=200';
+        const data=await fetch(url,{headers:h}).then(r=>r.json());
+        if(data.items)data.items.forEach(ev=>allEvents.push({...ev,_calBg:cal.backgroundColor||''}));
+      }catch(e){}
+    }
+
+    allEvents.sort((a,b)=>(a.start?.dateTime||a.start?.date||'').localeCompare(b.start?.dateTime||b.start?.date||''));
     renderGrid();
     const t=new Date().toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
-    setSt('ok',`Actualizat ${t} · ${allEvents.length} ev.`);
+    setSt('ok','Actualizat '+t+' · '+allEvents.length+' ev.');
   }catch(e){setSt('err','Eroare rețea');}
 }
-async function doRefresh(){await fetchEvents();}
 
-// ── DEMO DATA ──
-function demoEvs(){
-  const now=new Date(),y=now.getFullYear(),mo=now.getMonth();
-  const pool=[
-    {s:'Taekwon-do',c:'#6B9FD4',h:17,m:45},{s:'Taekwon-do',c:'#6B9FD4',h:10,m:30},
-    {s:'Robotică',c:'#E07070',h:14,m:0},
-    {s:'Control oftalmolog',c:'#E07070',h:15,m:30},
-    {s:'Call Viterra',c:'#4CAF8A',h:10,m:0},{s:'Raport Agrotex',c:'#4CAF8A',h:9,m:0},
-    {s:'Cumpărături',c:'#E07070',h:11,m:0},
-    {s:'Film familie',c:'#A07BC8',h:20,m:0},{s:'Cină familie',c:'#A07BC8',h:19,m:0},
-    {s:'Fotbal antrenament',c:'#6B9FD4',h:16,m:0},
-    {s:'Yoga',c:'#E07070',h:8,m:30},
-  ];
-  const evs=[];
-  // recurring: Taekwon-do Tue 17:45, Thu 17:45, Sat 10:30 | Robotica Tue 14:00
-  for(let d=1;d<=31;d++){
-    const dt=new Date(y,mo,d);if(dt.getMonth()!==mo)break;
-    const dow=dt.getDay();
-    if(dow===2||dow===4){// Tue/Thu
-      evs.push(makeEv(dt,17,45,'Taekwon-do','#6B9FD4'));
-      if(dow===2)evs.push(makeEv(dt,14,0,'Robotică','#E07070'));
-    }
-    if(dow===6)evs.push(makeEv(dt,10,30,'Taekwon-do','#6B9FD4'));
-  }
-  // sprinkle random
-  [3,5,8,12,15,18,22,25,28].forEach(d=>{
-    const p=pool[Math.floor(Math.random()*pool.length)];
-    evs.push(makeEv(new Date(y,mo,d),p.h,p.m,p.s,p.c));
-  });
-  return evs;
+function getColor(ev){
+  if(ev._color)return ev._color;
+  const txt=((ev.summary||'')+(ev.description||'')).toLowerCase();
+  for(const[k,v]of Object.entries(KW)){if(txt.includes(k))return v;}
+  if(ev._calBg&&ev._calBg!=='#039be5'&&ev._calBg!=='')return ev._calBg;
+  return '#A07BC8';
 }
-function makeEv(date,h,m,summary,color){
-  const s=new Date(date);s.setHours(h,m,0,0);
-  const e=new Date(s);e.setHours(h+1);
-  return{id:`d_${Math.random()}`,summary,_color:color,start:{dateTime:s.toISOString()},end:{dateTime:e.toISOString()}};
+function hexRgba(h,a){
+  const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  return'rgba('+r+','+g+','+b+','+a+')';
 }
 
-// ── RENDER MONTH GRID ──
 function chMonth(d){viewDate.setMonth(viewDate.getMonth()+d);fetchEvents();}
 function goToday(){viewDate=new Date();fetchEvents();}
 
 function renderGrid(){
   const y=viewDate.getFullYear(),mo=viewDate.getMonth();
-  document.getElementById('month-lbl').textContent=`${capitalize(MR[mo])} ${y}`;
-
+  document.getElementById('mlbl').textContent=cap(MR[mo])+' '+y;
   const today=new Date();
-  const firstDay=new Date(y,mo,1);
-  let startDow=firstDay.getDay();startDow=startDow===0?6:startDow-1;
-  const daysInMonth=new Date(y,mo+1,0).getDate();
-  const prevDays=new Date(y,mo,0).getDate();
+  let dow=new Date(y,mo,1).getDay();dow=dow===0?6:dow-1;
+  const dim=new Date(y,mo+1,0).getDate();
+  const prev=new Date(y,mo,0).getDate();
+  const rows=Math.ceil((dow+dim)/7);
 
-  // group events by date key
   const byDay={};
   allEvents.forEach(ev=>{
-    const t=ev.start?.dateTime?new Date(ev.start.dateTime):new Date(ev.start.date+'T00:00:00');
+    const t=ev.start?.dateTime?new Date(ev.start.dateTime):new Date((ev.start?.date||'')+'T00:00:00');
     if(t.getFullYear()===y&&t.getMonth()===mo){
-      const key=t.getDate();
-      if(!byDay[key])byDay[key]=[];
-      byDay[key].push({ev,time:t});
+      const k=t.getDate();
+      if(!byDay[k])byDay[k]=[];
+      byDay[k].push({ev,t});
     }
   });
-  // sort each day
-  Object.keys(byDay).forEach(k=>byDay[k].sort((a,b)=>a.time-b.time));
+  Object.keys(byDay).forEach(k=>byDay[k].sort((a,b)=>a.t-b.t));
 
-  const grid=document.getElementById('grid');grid.innerHTML='';
+  const grid=document.getElementById('grid');
+  grid.style.gridTemplateRows='repeat('+rows+',1fr)';
+  grid.innerHTML='';
 
-  // calculate rows needed
-  const totalCells=startDow+daysInMonth;
-  const rows=Math.ceil(totalCells/7);
-
-  // prev month cells
-  for(let i=0;i<startDow;i++){
-    const d=prevDays-startDow+i+1;
-    grid.appendChild(makeCell(d,true,false,[]));
+  for(let i=0;i<dow;i++)grid.appendChild(mkCell(prev-dow+i+1,true,false,[]));
+  for(let d=1;d<=dim;d++){
+    const isTod=d===today.getDate()&&mo===today.getMonth()&&y===today.getFullYear();
+    grid.appendChild(mkCell(d,false,isTod,byDay[d]||[]));
   }
-  // current month cells
-  for(let d=1;d<=daysInMonth;d++){
-    const isToday=d===today.getDate()&&mo===today.getMonth()&&y===today.getFullYear();
-    const evs=byDay[d]||[];
-    grid.appendChild(makeCell(d,false,isToday,evs));
-  }
-  // next month filler
-  const filled=startDow+daysInMonth;
-  const remaining=rows*7-filled;
-  for(let d=1;d<=remaining;d++){
-    grid.appendChild(makeCell(d,true,false,[]));
-  }
+  const fill=rows*7-(dow+dim);
+  for(let d=1;d<=fill;d++)grid.appendChild(mkCell(d,true,false,[]));
 }
 
-function makeCell(day,otherMonth,isToday,dayEvents){
+function mkCell(day,other,isToday,evs){
   const cell=document.createElement('div');
-  cell.className='day-cell fade-in'+(otherMonth?' other-month':'')+(isToday?' today':'');
-
-  const num=document.createElement('div');
-  num.className='day-num';num.textContent=day;cell.appendChild(num);
-
-  // how many chips fit? rough estimate based on available height
-  const maxChips=4;
-  const shown=dayEvents.slice(0,maxChips);
-  const extra=dayEvents.length-maxChips;
-
-  shown.forEach(({ev,time})=>{
-    const color=ev._color||getMemberColor(ev);
+  cell.className='dc fi'+(other?' other':'')+(isToday?' today':'');
+  const dn=document.createElement('div');
+  dn.className='dn';dn.textContent=day;cell.appendChild(dn);
+  const max=4;
+  evs.slice(0,max).forEach(({ev,t})=>{
+    const c=getColor(ev);
     const chip=document.createElement('div');
-    chip.className='ev-chip';
-    chip.style.background=hexToRgba(color,.18);
-    chip.style.color=color;
-    chip.style.borderLeft=`2.5px solid ${color}`;
-    let timeStr='';
-    if(ev.start?.dateTime){timeStr=`${pad(time.getHours())}:${pad(time.getMinutes())}`;}
-    chip.innerHTML=`${timeStr?`<span class="ev-chip-time">${timeStr}</span>`:''}${ev.summary||'Ev.'}`;
+    chip.className='chip';
+    chip.style.background=hexRgba(c,.18);
+    chip.style.color=c;
+    chip.style.borderLeft='2px solid '+c;
+    const timeStr=ev.start?.dateTime?pad(t.getHours())+':'+pad(t.getMinutes()):'';
+    chip.innerHTML=(timeStr?'<span class="chip-time">'+timeStr+'</span>':'')+esc(ev.summary||'Eveniment');
     chip.title=ev.summary||'';
     cell.appendChild(chip);
   });
-
-  if(extra>0){
-    const more=document.createElement('div');
-    more.className='more-badge';
-    more.textContent=`+${extra} mai mult${extra===1?'':'e'}`;
-    cell.appendChild(more);
+  if(evs.length>max){
+    const m=document.createElement('div');
+    m.className='more';
+    m.textContent='+'+(evs.length-max)+' mai mult'+(evs.length-max===1?'':'e');
+    cell.appendChild(m);
   }
-
   return cell;
 }
 
-function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
-
-// ── STATUS ──
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function setSt(type,msg){
   document.getElementById('sdot').style.background=type==='ok'?'#4CAF8A':type==='err'?'#E07070':'#6B9FD4';
   document.getElementById('stxt').textContent=msg;
+}
+
+function demoEvs(){
+  const now=new Date(),y=now.getFullYear(),mo=now.getMonth();
+  const evs=[];
+  for(let d=1;d<=31;d++){
+    const dt=new Date(y,mo,d);if(dt.getMonth()!==mo)break;
+    const dow=dt.getDay();
+    if(dow===2||dow===4){
+      evs.push(mk(dt,17,45,'Taekwon-do','#6B9FD4'));
+      if(dow===2)evs.push(mk(dt,14,0,'Robotică','#E07070'));
+    }
+    if(dow===6)evs.push(mk(dt,10,30,'Taekwon-do','#6B9FD4'));
+  }
+  const extras=[
+    [3,10,0,'Call Viterra','#4CAF8A'],[5,8,30,'Yoga','#E07070'],
+    [7,9,0,'Raport Agrotex','#4CAF8A'],[10,15,30,'Control oftalmolog','#E07070'],
+    [14,20,0,'Film familie','#A07BC8'],[17,11,0,'Cumpărături','#E07070'],
+    [20,9,0,'Training echipă','#4CAF8A'],[23,19,0,'Cină familie','#A07BC8'],
+    [25,16,0,'Fotbal','#6B9FD4'],[28,10,0,'Call Bunge','#4CAF8A'],
+  ];
+  extras.forEach(([d,h,m,s,c])=>evs.push(mk(new Date(y,mo,d),h,m,s,c)));
+  return evs;
+}
+function mk(date,h,m,summary,color){
+  const s=new Date(date);s.setHours(h,m,0,0);
+  return{id:'d_'+Math.random(),summary,_color:color,start:{dateTime:s.toISOString()}};
 }
 </script>
 </body>
