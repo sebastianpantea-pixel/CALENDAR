@@ -338,7 +338,7 @@ function resetAll(){
 }
 
 // ── LOGIN & TOKEN (redirect flow - works in Fully Kiosk) ──
-const REDIRECT_URI='https://sebastianpantea-pixel.github.io/CALENDAR/';
+const REDIRECT_URI=window.location.origin+window.location.pathname;
 const AUTH_URL='https://accounts.google.com/o/oauth2/v2/auth';
 const SCOPE='https://www.googleapis.com/auth/calendar';
 
