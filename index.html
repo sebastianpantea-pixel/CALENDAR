@@ -109,11 +109,9 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 .color-opt{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0;}
 .color-opt.selected{border-color:var(--txt);transform:scale(1.15);}
 .modal-btns{display:flex;gap:10px;margin-top:20px;}
-.modal-btn-cancel{flex:1;padding:11px;background:transparent;color:var(--txt2);border:1px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;}
-.modal-btn-cancel:hover{background:var(--surface2);}
-.modal-btn-save{flex:2;padding:11px;background:var(--seb);color:#fff;border:none;border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;}
-.modal-btn-save:hover{opacity:.85;}
-.modal-btn-save:disabled{opacity:.5;cursor:default;}
+.modal-btn-delete{padding:7px 14px;background:transparent;color:#E07070;border:1px solid #E07070;border-radius:8px;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;}
+.modal-btn-delete:hover{background:#E07070;color:#fff;}
+
 .all-day-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
 .toggle{width:36px;height:20px;background:var(--border);border-radius:10px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
 .toggle.on{background:var(--seb);}
@@ -171,7 +169,7 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 <!-- DASHBOARD -->
 <div id="dash">
   <div class="topbar">
-    <div class="clock-block">
+    <div class="clock-block" id="clock-block">
       <div class="clock" id="clk">--:--</div>
       <div class="date-sub" id="dsub">—</div>
     </div>
@@ -202,7 +200,6 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
         <div class="s-txt" id="stxt">—</div>
         <button class="icon-btn" onclick="fetchEvents()" title="Actualizează">↻</button>
         <button class="fs-btn" onclick="toggleFS()" title="Fullscreen" id="fsbtn">⛶</button>
-        <button class="icon-btn" onclick="doLogout()" title="Logout" style="font-size:10px;">⏏</button>
         <button class="icon-btn" onclick="resetAll()" title="Setări">⚙</button>
       </div>
     </div>
@@ -220,7 +217,10 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 <!-- ADD EVENT MODAL -->
 <div id="modal-overlay" class="gone" onclick="overlayClick(event)">
 <div class="modal" onclick="event.stopPropagation()">
-  <div class="modal-title">Eveniment nou</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div class="modal-title" id="modal-title" style="margin-bottom:0;">Eveniment nou</div>
+    <button id="delete-btn" class="modal-btn-delete" onclick="deleteEvent()" style="display:none;">🗑 Șterge</button>
+  </div>
 
   <div class="modal-field">
     <label class="modal-lbl">Titlu</label>
@@ -266,9 +266,11 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
     </div>
   </div>
 
+  <input type="hidden" id="ev-id" value="">
+  <input type="hidden" id="ev-cal-id-edit" value="">
   <div class="modal-btns">
     <button class="modal-btn-cancel" onclick="closeModal()">Anulează</button>
-    <button class="modal-btn-save" id="save-btn" onclick="saveEvent()">Salvează eveniment</button>
+    <button class="modal-btn-save" id="save-btn" onclick="saveEvent()">Salvează</button>
   </div>
 </div>
 </div>
@@ -292,11 +294,11 @@ let isDemo=false;
 
 // ── INIT ──
 window.onload=function(){
-  const s=localStorage.getItem('fcfg5');
+  const s=localStorage.getItem('fcfg6');
   if(s){try{cfg=JSON.parse(s);}catch(e){}}
   if(!cfg.clientId){show('setup-cid');return;}
   hide('setup-cid');
-  const tk=sessionStorage.getItem('gtoken5');
+  const tk=localStorage.getItem('gtoken6');
   if(tk){accessToken=tk;bootDash();}
   else showLogin();
 };
@@ -310,45 +312,82 @@ function saveCid(){
   const city=document.getElementById('i_city').value.trim()||'Oradea';
   if(!cid){alert('Introdu Client ID-ul OAuth.');return;}
   cfg={clientId:cid,city};
-  localStorage.setItem('fcfg5',JSON.stringify(cfg));
+  localStorage.setItem('fcfg6',JSON.stringify(cfg));
   hide('setup-cid');showLogin();
 }
 function resetAll(){
   if(!confirm('Resetezi configurarea?'))return;
-  localStorage.removeItem('fcfg5');sessionStorage.removeItem('gtoken5');
+  localStorage.removeItem('fcfg6');localStorage.removeItem('gtoken6');localStorage.removeItem('gtoken6_exp');
   location.reload();
 }
 
 // ── LOGIN ──
+// ── LOGIN & TOKEN ──
 function showLogin(){
   show('login');
   document.getElementById('dash').style.display='none';
   waitForGoogle();
 }
+
 function waitForGoogle(){
   if(!window.google){setTimeout(waitForGoogle,300);return;}
   tokenClient=google.accounts.oauth2.initTokenClient({
     client_id:cfg.clientId,
-    // read + write permissions
     scope:'https://www.googleapis.com/auth/calendar',
     callback:(resp)=>{
-      if(resp.error){document.getElementById('login-note').textContent='Eroare: '+resp.error;return;}
+      if(resp.error){
+        document.getElementById('login-note').textContent='Eroare: '+resp.error;
+        return;
+      }
       accessToken=resp.access_token;
-      sessionStorage.setItem('gtoken5',accessToken);
-      hide('login');bootDash();
+      // save token + expiry (55 min to be safe, Google gives 60)
+      const exp=Date.now()+(55*60*1000);
+      localStorage.setItem('gtoken6',accessToken);
+      localStorage.setItem('gtoken6_exp',String(exp));
+      hide('login');
+      bootDash();
     }
   });
+
+  // try silent refresh immediately if we have a saved token
+  const savedToken=localStorage.getItem('gtoken6');
+  const savedExp=parseInt(localStorage.getItem('gtoken6_exp')||'0');
+  if(savedToken && Date.now()<savedExp){
+    // token still valid — use it
+    accessToken=savedToken;
+    hide('login');
+    bootDash();
+    return;
+  }
+
+  // token expired or missing — try silent re-auth (no popup)
+  if(savedToken){
+    tokenClient.requestAccessToken({prompt:''});
+  }
 }
+
 function signIn(){
   document.getElementById('login-note').textContent='Se deschide fereastra Google...';
   if(!tokenClient){waitForGoogle();setTimeout(signIn,500);return;}
+  tokenClient.requestAccessToken({prompt:'select_account'});
+}
+
+// silent refresh — called automatically every 50 min
+function silentRefresh(){
+  if(!tokenClient||!cfg.clientId)return;
   tokenClient.requestAccessToken({prompt:''});
 }
+
 function doLogout(){
-  accessToken='';sessionStorage.removeItem('gtoken5');allEvents=[];calendarList=[];
+  // hidden — only from secret menu
+  accessToken='';
+  localStorage.removeItem('gtoken6');
+  localStorage.removeItem('gtoken6_exp');
+  allEvents=[];calendarList=[];
   document.getElementById('dash').style.display='none';
   showLogin();
 }
+
 function loadDemo(){isDemo=true;hide('login');bootDash(true);}
 
 // ── BOOT ──
@@ -356,6 +395,8 @@ function bootDash(demo=false){
   document.getElementById('dash').style.display='flex';
   tick();setInterval(tick,1000);
   fetchWeather();setInterval(fetchWeather,20*60*1000);
+  // auto refresh token every 50 min
+  if(!demo)setInterval(silentRefresh,50*60*1000);
   if(demo){
     allEvents=demoEvs();
     calendarList=[{id:'primary',summary:'Family Calendar'}];
@@ -365,12 +406,32 @@ function bootDash(demo=false){
   } else {
     fetchEvents();setInterval(fetchEvents,5*60*1000);
   }
-  // auto fullscreen on startup (good for tablet)
+  // auto fullscreen
   setTimeout(()=>{
-    if(!document.fullscreenElement && window.innerWidth>=600){
+    if(!document.fullscreenElement&&window.innerWidth>=600){
       document.documentElement.requestFullscreen().catch(()=>{});
     }
   },1000);
+}
+
+// ── SECRET MENU (long press on clock 3s) ──
+let pressTimer=null;
+function startPress(){pressTimer=setTimeout(showSecretMenu,3000);}
+function endPress(){clearTimeout(pressTimer);}
+document.addEventListener('DOMContentLoaded',()=>{
+  const cb=document.getElementById('clock-block');
+  cb.addEventListener('mousedown',startPress);
+  cb.addEventListener('mouseup',endPress);
+  cb.addEventListener('mouseleave',endPress);
+  cb.addEventListener('touchstart',startPress,{passive:true});
+  cb.addEventListener('touchend',endPress);
+  cb.style.cursor='default';
+  cb.title='';
+});
+function showSecretMenu(){
+  if(confirm('Meniu ascuns:\n\nOK = Logout (schimbă contul)\nCancel = Rămâi logat')){
+    doLogout();
+  }
 }
 
 // ── FULLSCREEN ──
@@ -421,6 +482,9 @@ async function fetchWeather(){
 // ── FETCH EVENTS ──
 async function fetchEvents(){
   if(!accessToken)return;
+  // check if token expired — refresh silently first
+  const exp=parseInt(localStorage.getItem('gtoken6_exp')||'0');
+  if(Date.now()>exp&&!isDemo){silentRefresh();await new Promise(r=>setTimeout(r,2000));}
   setSt('load','Se actualizează...');
   try{
     const h={'Authorization':'Bearer '+accessToken};
@@ -460,7 +524,15 @@ function populateCalSelect(){
 }
 
 // ── MODAL ──
+let editingEvent=null;
+
 function openModal(dateStr){
+  editingEvent=null;
+  document.getElementById('modal-title').textContent='Eveniment nou';
+  document.getElementById('delete-btn').style.display='none';
+  document.getElementById('save-btn').textContent='Salvează';
+  document.getElementById('ev-id').value='';
+  document.getElementById('ev-cal-id-edit').value='';
   clickedDate=dateStr||todayStr();
   document.getElementById('ev-date').value=clickedDate;
   document.getElementById('ev-title').value='';
@@ -468,8 +540,83 @@ function openModal(dateStr){
   document.getElementById('ev-end').value='10:00';
   isAllDay=false;
   updateAlldayUI();
+  // reset color to first
+  document.querySelectorAll('.color-opt').forEach((e,i)=>e.classList.toggle('selected',i===0));
+  selectedColorId='2';
   show('modal-overlay');
   setTimeout(()=>document.getElementById('ev-title').focus(),100);
+}
+
+function openEditModal(ev){
+  editingEvent=ev;
+  document.getElementById('modal-title').textContent='Editează eveniment';
+  document.getElementById('delete-btn').style.display='block';
+  document.getElementById('save-btn').textContent='Actualizează';
+  document.getElementById('ev-id').value=ev.id||'';
+  document.getElementById('ev-cal-id-edit').value=ev._calId||'primary';
+
+  document.getElementById('ev-title').value=ev.summary||'';
+
+  // detect all-day
+  const hasDateTime=!!ev.start?.dateTime;
+  isAllDay=!hasDateTime;
+  updateAlldayUI();
+
+  if(hasDateTime){
+    const s=new Date(ev.start.dateTime);
+    const e=new Date(ev.end.dateTime);
+    document.getElementById('ev-date').value=s.getFullYear()+'-'+pad(s.getMonth()+1)+'-'+pad(s.getDate());
+    document.getElementById('ev-start').value=pad(s.getHours())+':'+pad(s.getMinutes());
+    document.getElementById('ev-end').value=pad(e.getHours())+':'+pad(e.getMinutes());
+  } else {
+    document.getElementById('ev-date').value=ev.start?.date||todayStr();
+  }
+
+  // set color
+  if(ev.colorId){
+    document.querySelectorAll('.color-opt').forEach(el=>{
+      el.classList.toggle('selected',el.dataset.color===ev.colorId);
+    });
+    selectedColorId=ev.colorId;
+  }
+
+  // set calendar select
+  if(ev._calId){
+    const sel=document.getElementById('ev-cal');
+    if([...sel.options].some(o=>o.value===ev._calId))sel.value=ev._calId;
+  }
+
+  show('modal-overlay');
+  setTimeout(()=>document.getElementById('ev-title').focus(),100);
+}
+
+async function deleteEvent(){
+  if(!editingEvent)return;
+  if(!confirm('Ștergi evenimentul "'+editingEvent.summary+'"?'))return;
+
+  if(isDemo){
+    allEvents=allEvents.filter(e=>e.id!==editingEvent.id);
+    renderGrid();closeModal();return;
+  }
+
+  const calId=editingEvent._calId||'primary';
+  const evId=editingEvent.id;
+  const btn=document.getElementById('delete-btn');
+  btn.textContent='Se șterge...';btn.disabled=true;
+
+  try{
+    const res=await fetch('https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events/'+encodeURIComponent(evId),{
+      method:'DELETE',
+      headers:{'Authorization':'Bearer '+accessToken}
+    });
+    if(res.status===204||res.ok){
+      closeModal();await fetchEvents();
+    } else {
+      const err=await res.json();
+      alert('Eroare ștergere: '+(err.error?.message||res.status));
+    }
+  }catch(e){alert('Eroare rețea: '+e.message);}
+  btn.textContent='🗑 Șterge';btn.disabled=false;
 }
 function closeModal(){hide('modal-overlay');}
 function overlayClick(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
@@ -499,15 +646,19 @@ async function saveEvent(){
   if(!title){document.getElementById('ev-title').focus();return;}
   const dateVal=document.getElementById('ev-date').value;
   if(!dateVal){alert('Alege o dată.');return;}
-  const calId=document.getElementById('ev-cal').value;
+  const calId=editingEvent?( document.getElementById('ev-cal-id-edit').value||'primary') : document.getElementById('ev-cal').value;
+  const evId=document.getElementById('ev-id').value;
+  const isEdit=!!evId&&!evId.startsWith('d_');
 
   const btn=document.getElementById('save-btn');
-  btn.disabled=true;btn.textContent='Se salvează...';
+  btn.disabled=true;btn.textContent=isEdit?'Se actualizează...':'Se salvează...';
 
   let body={summary:title,colorId:selectedColorId};
   if(isAllDay){
+    // all-day end = next day for Google API
+    const endDate=new Date(dateVal);endDate.setDate(endDate.getDate()+1);
     body.start={date:dateVal};
-    body.end={date:dateVal};
+    body.end={date:endDate.getFullYear()+'-'+pad(endDate.getMonth()+1)+'-'+pad(endDate.getDate())};
   } else {
     const startT=document.getElementById('ev-start').value||'09:00';
     const endT=document.getElementById('ev-end').value||'10:00';
@@ -516,32 +667,35 @@ async function saveEvent(){
   }
 
   if(isDemo){
-    // demo mode: just add locally
-    allEvents.push({id:'new_'+Date.now(),summary:title,_color:['#4CAF8A','#E07070','#6B9FD4','#A07BC8','#E09C50'][Math.floor(Math.random()*5)],start:body.start,end:body.end});
+    if(isEdit){
+      const idx=allEvents.findIndex(e=>e.id===evId);
+      if(idx>=0)allEvents[idx]={...allEvents[idx],summary:title,start:body.start,end:body.end};
+    } else {
+      allEvents.push({id:'new_'+Date.now(),summary:title,_color:'#4CAF8A',start:body.start,end:body.end});
+    }
     allEvents.sort((a,b)=>(a.start?.dateTime||a.start?.date||'').localeCompare(b.start?.dateTime||b.start?.date||''));
     renderGrid();closeModal();
-    btn.disabled=false;btn.textContent='Salvează eveniment';
+    btn.disabled=false;btn.textContent=isEdit?'Actualizează':'Salvează';
     return;
   }
 
   try{
-    const res=await fetch('https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events',{
-      method:'POST',
+    const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events'+(isEdit?'/'+encodeURIComponent(evId):'');
+    const method=isEdit?'PATCH':'POST';
+    const res=await fetch(url,{
+      method,
       headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
       body:JSON.stringify(body)
     });
     if(!res.ok){
       const err=await res.json();
       alert('Eroare: '+(err.error?.message||res.status));
-      btn.disabled=false;btn.textContent='Salvează eveniment';
+      btn.disabled=false;btn.textContent=isEdit?'Actualizează':'Salvează';
       return;
     }
-    closeModal();
-    await fetchEvents();
-  }catch(e){
-    alert('Eroare rețea: '+e.message);
-  }
-  btn.disabled=false;btn.textContent='Salvează eveniment';
+    closeModal();await fetchEvents();
+  }catch(e){alert('Eroare rețea: '+e.message);}
+  btn.disabled=false;btn.textContent=isEdit?'Actualizează':'Salvează';
 }
 
 // ── GRID ──
@@ -614,7 +768,7 @@ function mkCell(day,other,isToday,evs,dateStr){
     const timeStr=ev.start?.dateTime?pad(t.getHours())+':'+pad(t.getMinutes()):'';
     chip.innerHTML=(timeStr?'<span class="chip-time">'+timeStr+'</span>':'')+esc(ev.summary||'Eveniment');
     chip.title=ev.summary||'';
-    chip.onclick=e=>{e.stopPropagation();};
+    chip.onclick=e=>{e.stopPropagation();openEditModal(ev);};
     cell.appendChild(chip);
   });
   if(evs.length>max){
