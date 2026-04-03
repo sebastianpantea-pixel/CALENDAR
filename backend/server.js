@@ -96,8 +96,25 @@ app.get('/events', async (req, res) => {
           orderBy: 'startTime',
           maxResults: 200
         });
-        (evRes.data.items || []).forEach(ev => allEvents.push({
+        const items = evRes.data.items || [];
+
+        // For recurring events without colorId, fetch the base event to get its color
+        const recurringColors = {};
+        const toFetch = [...new Set(
+          items
+            .filter(ev => !ev.colorId && ev.recurringEventId)
+            .map(ev => ev.recurringEventId)
+        )];
+        for (const rid of toFetch) {
+          try {
+            const base = await calendar.events.get({ calendarId: cal.id, eventId: rid });
+            if (base.data.colorId) recurringColors[rid] = base.data.colorId;
+          } catch(e) {}
+        }
+
+        items.forEach(ev => allEvents.push({
           ...ev,
+          colorId: ev.colorId || recurringColors[ev.recurringEventId] || null,
           _calName: cal.summary,
           _calBg: cal.backgroundColor || '',
           _calId: cal.id
