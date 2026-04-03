@@ -50,22 +50,22 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 
 /* ── DASHBOARD ── */
 #dash{height:100vh;display:none;flex-direction:column;}
-.topbar{display:flex;align-items:stretch;border-bottom:2px solid var(--border);flex-shrink:0;background:var(--surface);height:72px;}
-.clock-block{padding:8px 16px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border);flex-shrink:0;}
-.clock{font-family:'DM Serif Display',serif;font-size:38px;line-height:1;letter-spacing:-1px;}
-.date-sub{font-size:11px;color:var(--txt2);margin-top:2px;text-transform:capitalize;white-space:nowrap;}
-.weather-block{padding:6px 14px;display:flex;gap:10px;align-items:center;border-right:1px solid var(--border);flex-shrink:0;}
-.ws{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:38px;}
-.wl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
-.wi{font-size:20px;line-height:1;}
-.wt{font-size:14px;font-weight:600;color:var(--txt);}
+.topbar{display:flex;align-items:stretch;border-bottom:2px solid var(--border);flex-shrink:0;background:var(--surface);height:90px;}
+.clock-block{padding:10px 20px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border);flex-shrink:0;}
+.clock{font-family:'DM Serif Display',serif;font-size:52px;line-height:1;letter-spacing:-2px;}
+.date-sub{font-size:12px;color:var(--txt2);margin-top:3px;text-transform:capitalize;white-space:nowrap;}
+.weather-block{padding:8px 16px;display:flex;gap:12px;align-items:center;border-right:1px solid var(--border);flex-shrink:0;}
+.ws{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:44px;}
+.wl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+.wi{font-size:26px;line-height:1;}
+.wt{font-size:17px;font-weight:700;color:var(--txt);}
 .wdiv{width:1px;background:var(--border);align-self:stretch;}
-.header-right{flex:1;display:flex;align-items:center;justify-content:space-between;padding:8px 16px;gap:10px;min-width:0;overflow:hidden;}
-.month-nav{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.month-title{font-family:'DM Serif Display',serif;font-size:22px;text-transform:capitalize;white-space:nowrap;color:var(--txt);}
-.nav-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.header-right{flex:1;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;gap:12px;min-width:0;overflow:hidden;}
+.month-nav{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.month-title{font-family:'DM Serif Display',serif;font-size:26px;text-transform:capitalize;white-space:nowrap;color:var(--txt);}
+.nav-btn{width:32px;height:32px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-btn:hover{background:var(--surface2);}
-.today-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;flex-shrink:0;}
+.today-btn{padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;flex-shrink:0;}
 .today-btn:hover{background:var(--surface2);}
 
 /* ADD EVENT BUTTON */
@@ -199,8 +199,6 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
         <div class="s-dot" id="sdot"></div>
         <div class="s-txt" id="stxt">—</div>
         <button class="icon-btn" onclick="fetchEvents()" title="Actualizează">↻</button>
-        <button class="fs-btn" onclick="toggleFS()" title="Fullscreen" id="fsbtn">⛶</button>
-        <button class="icon-btn" onclick="resetAll()" title="Setări">⚙</button>
       </div>
     </div>
   </div>
