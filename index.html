@@ -63,6 +63,8 @@ html,body{height:100%;background:var(--bg);font-family:'Outfit',sans-serif;color
 .header-right{flex:1;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;gap:8px;min-width:0;overflow:hidden;}
 .month-nav{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .month-title{font-family:'DM Serif Display',serif;font-size:22px;text-transform:capitalize;white-space:nowrap;color:var(--txt);}
+.month-name{font-family:'DM Serif Display',serif;font-size:20px;text-transform:capitalize;color:var(--txt);line-height:1.1;}
+.month-year{font-size:13px;color:var(--txt2);font-weight:500;line-height:1.2;}
 .nav-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-btn:hover{background:var(--surface2);}
 .today-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;flex-shrink:0;}
@@ -191,7 +193,10 @@ html,body{height:100%;background:var(--bg);font-family:'Outfit',sans-serif;color
     <div class="header-right">
       <div class="month-nav">
         <button class="nav-btn" onclick="chMonth(-1)">‹</button>
-        <div class="month-title" id="mlbl">—</div>
+        <div id="mlbl" style="display:flex;flex-direction:column;align-items:flex-start;">
+          <div class="month-name" id="mlbl-month">—</div>
+          <div class="month-year" id="mlbl-year">—</div>
+        </div>
         <button class="nav-btn" onclick="chMonth(1)">›</button>
         <button class="today-btn" onclick="goToday()">Azi</button>
       </div>
@@ -650,7 +655,8 @@ function hexRgba(h,a){
 
 function renderGrid(){
   const y=viewDate.getFullYear(),mo=viewDate.getMonth();
-  document.getElementById('mlbl').textContent=cap(MR[mo])+' '+y;
+  document.getElementById('mlbl-month').textContent=cap(MR[mo]);
+  document.getElementById('mlbl-year').textContent=String(y);
   const today=new Date();
   let dow=new Date(y,mo,1).getDay();dow=dow===0?6:dow-1;
   const dim=new Date(y,mo+1,0).getDate();
