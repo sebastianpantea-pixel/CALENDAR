@@ -277,7 +277,7 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 
 <script>
 const WC={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',61:'🌧',63:'🌧',65:'🌧',71:'🌨',73:'🌨',75:'❄️',80:'🌦',81:'🌧',82:'⛈',95:'⛈',99:'⛈'};
-const KW={'sebastian':'#4CAF8A','seb':'#4CAF8A','alina':'#E07070','ali':'#E07070','fiul':'#6B9FD4','baiat':'#6B9FD4'};
+const KW={'sebastian':'#4CAF8A','seb':'#4CAF8A','alina':'#E07070','ali':'#E07070','fiul':'#6B9FD4','baiat':'#6B9FD4','taekwon':'#51b749','robotica':'#ff887c','robotică':'#ff887c'};
 const DR=['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
 const MR=['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'];
 
@@ -633,11 +633,11 @@ function getColor(ev){
   if(ev._color)return ev._color;
   // colorId pe eveniment — prioritate maximă
   if(ev.colorId&&GC[ev.colorId])return GC[ev.colorId];
-  // culoarea calendarului ca fallback (skip galben default)
-  if(ev._calBg&&ev._calBg!=='#fad165'&&ev._calBg!=='#039be5'&&ev._calBg!=='')return ev._calBg;
-  // keyword fallback
+  // keyword fallback pentru evenimente fără colorId
   const txt=((ev.summary||'')+(ev.description||'')).toLowerCase();
   for(const[k,v]of Object.entries(KW)){if(txt.includes(k))return v;}
+  // culoarea calendarului (orice culoare, inclusiv galben)
+  if(ev._calBg&&ev._calBg!=='')return ev._calBg;
   return '#5484ed';
 }
 function hexRgba(h,a){
