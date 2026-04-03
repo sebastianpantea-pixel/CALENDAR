@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Family Calendar</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -14,7 +14,7 @@
   --seb:#4CAF8A;--ali:#E07070;--fiu:#6B9FD4;--fam:#A07BC8;
   --today-ring:#4fc3f7;--today-bg:#0277bd;
 }
-html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:var(--txt);overflow:hidden;}
+html,body{height:100%;background:var(--bg);font-family:'Outfit',sans-serif;color:var(--txt);overflow:hidden;}
 
 /* ── SETUP ── */
 #setup-cid{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;}
@@ -183,6 +183,10 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
       <div class="ws"><div class="wl">Dimineață</div><div class="wi" id="wx3">🌤</div><div class="wt" id="wt3">--°</div></div>
       <div class="wdiv"></div>
       <div class="ws"><div class="wl">Amiază</div><div class="wi" id="wx4">🌤</div><div class="wt" id="wt4">--°</div></div>
+      <div class="wdiv"></div>
+      <div class="ws"><div class="wl" id="wl5">Mâine</div><div class="wi" id="wx5">🌤</div><div class="wt" id="wt5">--°</div></div>
+      <div class="wdiv"></div>
+      <div class="ws"><div class="wl" id="wl6">Poimâine</div><div class="wi" id="wx6">🌤</div><div class="wt" id="wt6">--°</div></div>
     </div>
     <div class="header-right">
       <div class="month-nav">
@@ -696,7 +700,8 @@ function mkCell(day,other,isToday,evs,dateStr){
     chip.style.borderLeft='none';
     chip.style.textShadow='0 1px 2px rgba(0,0,0,.3)';
     const timeStr=ev.start?.dateTime?pad(t.getHours())+':'+pad(t.getMinutes()):'';
-    chip.innerHTML=(timeStr?'<span class="chip-time">'+timeStr+'</span>':'')+esc(ev.summary||'Eveniment');
+    const isBday=isBirthday(ev);
+    chip.innerHTML=(timeStr?'<span class="chip-time">'+timeStr+'</span>':'')+(isBday?'🎂 ':'')+esc(ev.summary||'Eveniment');
     chip.title=ev.summary||'';
     chip.onclick=e=>{e.stopPropagation();openEditModal(ev);};
     cell.appendChild(chip);
@@ -737,6 +742,106 @@ function mk(date,h,m,summary,color){
   const s=new Date(date);s.setHours(h,m,0,0);
   return{id:'d_'+Math.random(),summary,_color:color,start:{dateTime:s.toISOString()}};
 }
+
+// ── NIGHT MODE (22:00 - 07:00) ──
+function checkNightMode(){
+  const h=new Date().getHours();
+  const isNight=h>=22||h<7;
+  document.body.style.filter=isNight?'brightness(0.15)':'brightness(1)';
+  document.body.style.transition='filter 2s ease';
+}
+setInterval(checkNightMode,60000);
+checkNightMode();
+
+// Wake on any touch/click during night
+document.addEventListener('touchstart',wakeScreen,{passive:true});
+document.addEventListener('click',wakeScreen);
+let wakeTimer=null;
+function wakeScreen(){
+  const h=new Date().getHours();
+  if(h<7||h>=22){
+    document.body.style.filter='brightness(1)';
+    clearTimeout(wakeTimer);
+    wakeTimer=setTimeout(checkNightMode,30000); // re-dim after 30s
+  }
+}
+
+// ── UPCOMING EVENT NOTIFICATIONS ──
+let notifiedEvents=new Set();
+function checkUpcoming(){
+  const now=new Date();
+  allEvents.forEach(ev=>{
+    if(!ev.start?.dateTime)return;
+    const start=new Date(ev.start.dateTime);
+    const diff=(start-now)/60000; // minutes
+    if(diff>0&&diff<=10&&!notifiedEvents.has(ev.id)){
+      notifiedEvents.add(ev.id);
+      showNotification(ev.summary,Math.round(diff));
+    }
+  });
+}
+setInterval(checkUpcoming,30000);
+
+function showNotification(title,mins){
+  const n=document.createElement('div');
+  n.style.cssText=`position:fixed;top:20px;left:50%;transform:translateX(-50%);
+    background:#4CAF8A;color:#fff;padding:14px 24px;border-radius:12px;
+    font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;
+    z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.4);
+    animation:slideDown .4s ease;white-space:nowrap;`;
+  n.innerHTML=`⏰ <strong>${esc(title)}</strong> începe în ${mins} min`;
+  document.body.appendChild(n);
+  setTimeout(()=>n.remove(),8000);
+}
+
+// Add slideDown animation
+const notifStyle=document.createElement('style');
+notifStyle.textContent='@keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+document.head.appendChild(notifStyle);
+
+// ── BIRTHDAY / ANNIVERSARY DETECTION ──
+function isBirthday(ev){
+  const s=((ev.summary||'')+(ev.description||'')).toLowerCase();
+  return s.includes('zi de naștere')||s.includes('aniversar')||s.includes('birthday')||
+         s.includes('nastere')||s.includes('ziua lui')||s.includes('ziua ei')||s.includes('ziua ta');
+}
+
+// Override getColor for birthdays
+const _origGetColor=getColor;
+window.getColor=function(ev){
+  if(isBirthday(ev))return '#FF6B9D'; // pink for birthdays
+  return _origGetColor(ev);
+};
+
+// Override mkCell to add 🎂 on birthday chips
+const _origMkCell=mkCell;
+// Birthday chips get special treatment in renderGrid via getColor pink + emoji in chip
+
+// ── WEEKLY WEATHER (2 extra days) ──
+const _origFetchWeather=fetchWeather;
+window.fetchWeather=async function(){
+  await _origFetchWeather();
+  // Add 2 more day forecasts
+  try{
+    const g=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(cfg.city)+'&count=1&format=json').then(r=>r.json());
+    if(!g.results?.length)return;
+    const{latitude,longitude}=g.results[0];
+    const d=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+latitude+'&longitude='+longitude+'&daily=weathercode,temperature_2m_max&timezone=Europe/Bucharest&forecast_days=4').then(r=>r.json());
+    const WC={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',53:'🌦',55:'🌧',61:'🌧',63:'🌧',65:'🌧',71:'🌨',73:'🌨',75:'❄️',80:'🌦',81:'🌧',82:'⛈',95:'⛈',99:'⛈'};
+    const DR=['Dum','Lun','Mar','Mie','Joi','Vin','Sâm'];
+    // day index 2 = day after tomorrow, 3 = 2 days after
+    if(d.daily?.weathercode?.length>=4){
+      const d2=new Date();d2.setDate(d2.getDate()+2);
+      const d3=new Date();d3.setDate(d3.getDate()+3);
+      document.getElementById('wl5').textContent=DR[d2.getDay()];
+      document.getElementById('wx5').textContent=WC[d.daily.weathercode[2]]||'🌤';
+      document.getElementById('wt5').textContent=Math.round(d.daily.temperature_2m_max[2])+'°';
+      document.getElementById('wl6').textContent=DR[d3.getDay()];
+      document.getElementById('wx6').textContent=WC[d.daily.weathercode[3]]||'🌤';
+      document.getElementById('wt6').textContent=Math.round(d.daily.temperature_2m_max[3])+'°';
+    }
+  }catch(e){}
+};
 </script>
 </body>
 </html>
