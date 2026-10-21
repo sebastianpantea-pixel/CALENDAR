@@ -146,6 +146,61 @@ html,body{height:100%;background:var(--bg);font-family:'Outfit',sans-serif;color
 .toggle.on::after{transform:translateX(16px);}
 .all-day-lbl{font-size:13px;color:var(--txt2);}
 
+
+/* ── WEATHER DETAILS: CLICKABLE EXTENDED FORECAST ── */
+.weather-panel{cursor:pointer;transition:background .15s ease;position:relative;}
+.weather-panel:hover{background:linear-gradient(135deg,#273d59,#203148);}
+.weather-panel:focus-visible{outline:2px solid var(--today-ring);outline-offset:-3px;}
+.weather-open-hint{font-size:10px;font-weight:700;letter-spacing:.02em;color:#9acbea;margin-top:7px;}
+#weather-detail-overlay{position:fixed;inset:0;background:rgba(5,10,20,.82);z-index:450;display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(7px);}
+#weather-detail-overlay.gone{display:none;}
+.weather-detail{width:min(1120px,100%);max-height:calc(100dvh - 36px);min-height:280px;background:#1b293e;border:1px solid #42526a;border-radius:17px;overflow-y:auto;overscroll-behavior:contain;box-shadow:0 28px 90px rgba(0,0,0,.55);scrollbar-color:#51647c #1b293e;}
+.wd-header{position:sticky;top:0;z-index:2;background:#1b293e;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:20px 24px 16px;border-bottom:1px solid var(--border);}
+.wd-title{font-family:'DM Serif Display',serif;font-size:27px;line-height:1.1;}
+.wd-subtitle{font-size:12px;color:var(--txt2);margin-top:5px;}
+.wd-actions{display:flex;gap:8px;flex-shrink:0;}
+.wd-action{border:1px solid #4b5d75;color:var(--txt);background:#29394f;border-radius:9px;padding:8px 13px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;min-height:38px;}
+.wd-action:hover{background:#344962;}
+.wd-action:focus-visible,.wd-day:focus-visible{outline:2px solid #9acbea;outline-offset:2px;}
+.wd-close{font-size:23px;line-height:1;min-width:40px;padding:6px;}
+.wd-content{padding:20px 24px 25px;}
+.wd-section-title{font-size:11px;text-transform:uppercase;color:#a4b9d4;letter-spacing:.1em;font-weight:700;margin-bottom:10px;}
+.wd-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-bottom:24px;}
+.wd-day{border:1px solid #384c66;border-radius:10px;min-width:0;background:#23334a;color:var(--txt);padding:12px 5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;}
+.wd-day:hover{background:#2a4260;}
+.wd-day[aria-pressed="true"]{border-color:#86c6ef;background:#234964;box-shadow:inset 0 0 0 1px #86c6ef;}
+.wd-day-name{font-size:11px;color:#b9c9df;font-weight:700;}
+.wd-day-date{font-size:10px;color:#839fbd;}
+.wd-day-icon{font-size:24px;line-height:1.3;}
+.wd-day-range{font-size:12px;font-weight:700;white-space:nowrap;}
+.wd-day-rain{font-size:10px;color:#8dcef4;}
+.wd-focus{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 22px;border-radius:12px;background:linear-gradient(110deg,#253e5b,#203148);margin-bottom:19px;}
+.wd-focus-date{font-size:12px;color:#b5cbe3;margin-bottom:7px;}
+.wd-focus-summary{font-size:22px;font-weight:600;margin-bottom:5px;}
+.wd-focus-range{font-size:13px;color:#b5cbe3;}
+.wd-focus-icon{font-size:68px;line-height:1;}
+.wd-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:23px;}
+.wd-metric{background:#223248;border:1px solid #30445e;border-radius:10px;padding:12px 13px;min-width:0;}
+.wd-metric-label{font-size:10px;color:#9eafc5;margin-bottom:6px;line-height:1.3;}
+.wd-metric-value{font-size:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wd-chart-legend{font-size:11px;color:#9eb4cc;margin-bottom:9px;display:flex;gap:15px;flex-wrap:wrap;}
+.wd-chart-line{color:#f2ce8b;}
+.wd-chart-bar{color:#80bde7;}
+.wd-chart{background:#1e2d42;border:1px solid #30445e;border-radius:10px;padding:12px 10px 5px;overflow:hidden;margin-bottom:20px;}
+.wd-chart svg{width:100%;height:auto;max-height:230px;display:block;}
+.wd-table-wrap{border:1px solid #344761;border-radius:10px;overflow-x:auto;}
+.wd-table{width:100%;border-collapse:collapse;text-align:right;font-variant-numeric:tabular-nums;min-width:850px;font-size:11px;}
+.wd-table th{position:sticky;top:0;background:#293c55;color:#afc4da;font-size:10px;padding:11px 10px;font-weight:600;white-space:nowrap;}
+.wd-table td{padding:9px 10px;border-top:1px solid #304159;color:#dbe6f4;white-space:nowrap;}
+.wd-table th:first-child,.wd-table td:first-child{text-align:left;}
+.wd-table tr:nth-child(even){background:#213149;}
+.wd-table tr.wd-current-hour{background:#284a5b;}
+.wd-foot{margin-top:16px;font-size:11px;line-height:1.55;color:#91a5be;}
+.wd-status{font-size:14px;color:var(--txt2);padding:35px 10px;text-align:center;}
+@media(max-width:850px){.wd-days{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.wd-day{padding:9px 2px}.wd-day-icon{font-size:20px}.wd-day-range{font-size:10px}.wd-day-rain{font-size:9px}.wd-metrics{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:620px){#weather-detail-overlay{padding:6px}.weather-detail{max-height:calc(100dvh - 12px);border-radius:12px}.wd-header{padding:14px}.wd-title{font-size:22px}.wd-content{padding:14px}.wd-days{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.wd-day{padding:10px 3px}.wd-day-icon{font-size:21px}.wd-day-range{font-size:12px}.wd-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.wd-metric-value{font-size:17px}.wd-focus{padding:14px}.wd-focus-icon{font-size:44px}.wd-focus-summary{font-size:18px}.wd-action{padding:7px 10px}.wd-hide-mobile{display:none}}
+@media(prefers-reduced-motion:reduce){.weather-panel{transition:none}}
+
 /* FULLSCREEN BTN - defined above in status-area */
 
 @keyframes fi{from{opacity:0}to{opacity:1}}
@@ -220,7 +275,7 @@ html,body{height:100%;background:var(--bg);font-family:'Outfit',sans-serif;color
     </div>
   </div>
 
-  <div class="weather-panel" id="weather-panel">
+  <div class="weather-panel" id="weather-panel" role="button" tabindex="0" aria-label="Deschide prognoza meteo detaliată pentru 14 zile" onclick="openWeatherDetail()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openWeatherDetail();}">
     <div class="weather-now">
       <div class="weather-city" id="weather-city">Oradea</div>
       <div class="weather-now-main">
@@ -230,6 +285,7 @@ html,body{height:100%;background:var(--bg);font-family:'Outfit',sans-serif;color
       <div class="weather-condition" id="weather-condition">Se încarcă vremea...</div>
       <div class="weather-feels" id="weather-feels">Se simte ca --°</div>
       <div class="weather-minmax" id="weather-minmax">Min --° · Max --°</div>
+      <div class="weather-open-hint">Prognoza pe 14 zile ↗</div>
     </div>
     <div class="weather-middle">
       <div>
@@ -252,6 +308,26 @@ html,body{height:100%;background:var(--bg);font-family:'Outfit',sans-serif;color
     </div>
     <div class="month-grid" id="grid"></div>
   </div>
+</div>
+
+
+<!-- EXTENDED WEATHER FORECAST -->
+<div id="weather-detail-overlay" class="gone" onclick="if(event.target===this)closeWeatherDetail()">
+  <section class="weather-detail" role="dialog" aria-modal="true" aria-labelledby="wd-title">
+    <div class="wd-header">
+      <div>
+        <div class="wd-title" id="wd-title">Prognoza meteo · 14 zile</div>
+        <div class="wd-subtitle" id="wd-location">Oradea · Date Open-Meteo</div>
+      </div>
+      <div class="wd-actions">
+        <button class="wd-action wd-hide-mobile" id="wd-refresh" type="button" onclick="fetchWeather()">↻ Actualizează</button>
+        <button class="wd-action wd-close" id="wd-close" type="button" aria-label="Închide prognoza" onclick="closeWeatherDetail()">×</button>
+      </div>
+    </div>
+    <div class="wd-content" id="wd-content">
+      <div class="wd-status">Se încarcă prognoza...</div>
+    </div>
+  </section>
 </div>
 
 <!-- ADD EVENT MODAL -->
@@ -416,14 +492,14 @@ function showSecretMenu(){
 function toggleFS(){
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen().catch(()=>{});
-    document.getElementById('fsbtn').textContent='⊠';
+    const btn=document.getElementById('fsbtn');if(btn)btn.textContent='⊠';
   } else {
     document.exitFullscreen();
-    document.getElementById('fsbtn').textContent='⛶';
+    const btn=document.getElementById('fsbtn');if(btn)btn.textContent='⛶';
   }
 }
 document.addEventListener('fullscreenchange',()=>{
-  document.getElementById('fsbtn').textContent=document.fullscreenElement?'⊠':'⛶';
+  const btn=document.getElementById('fsbtn');if(btn)btn.textContent=document.fullscreenElement?'⊠':'⛶';
 });
 
 // ── CLOCK ──
@@ -437,51 +513,74 @@ function pad(x){return String(x).padStart(2,'0');}
 // ── WEATHER ──
 const WDESC={0:'Senin',1:'Mai mult senin',2:'Parțial noros',3:'Înnorat',45:'Ceață',48:'Ceață',51:'Burniță slabă',53:'Burniță',55:'Burniță puternică',61:'Ploaie slabă',63:'Ploaie',65:'Ploaie puternică',71:'Ninsoare slabă',73:'Ninsoare',75:'Ninsoare puternică',80:'Averse slabe',81:'Averse',82:'Averse puternice',95:'Furtună',99:'Furtună'};
 const WDAY=['Dum','Lun','Mar','Mie','Joi','Vin','Sâm'];
+let weatherData=null;
+let weatherLocation='Oradea';
+let selectedWeatherDate=null;
+let weatherFocusBeforeOpen=null;
+let weatherRequestPending=false;
+
+const wxNumber=(value,digits=0)=>Number.isFinite(Number(value))&&value!==null&&value!==undefined?Number(value).toFixed(digits):'—';
+const wxValue=(value,unit='',digits=0)=>wxNumber(value,digits)+(value==null||!Number.isFinite(Number(value))?'':' '+unit);
+const wxTime=(value)=>value?.includes('T')?value.split('T')[1].slice(0,5):'—';
+const wxDate=(iso,options={weekday:'long',day:'numeric',month:'long'})=>new Intl.DateTimeFormat('ro-RO',{...options,timeZone:'UTC'}).format(new Date(iso+'T12:00:00Z'));
+const wxHours=(seconds)=>Number.isFinite(Number(seconds))&&seconds!=null?(Number(seconds)/3600).toFixed(1)+' h':'—';
+const wxWindDir=(deg)=>deg==null?'—':['N','NE','E','SE','S','SV','V','NV'][Math.round(((deg%360)+360)%360/45)%8];
+const wxRound=(v)=>v==null||!Number.isFinite(Number(v))?'—':Math.round(v);
+
 async function fetchWeather(){
+  if(weatherRequestPending)return;
+  weatherRequestPending=true;
+  const refresh=document.getElementById('wd-refresh');
+  if(refresh)refresh.disabled=true;
   try{
-    const g=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(cfg.city)+'&count=1&format=json').then(r=>r.json());
-    if(!g.results?.length)return;
-    const{latitude,longitude,name}=g.results[0];
-    const url='https://api.open-meteo.com/v1/forecast?latitude='+latitude+'&longitude='+longitude+
-      '&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m'+
-      '&hourly=temperature_2m,weather_code,precipitation_probability,precipitation'+
-      '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum'+
-      '&timezone=Europe/Bucharest&forecast_days=6';
-    const d=await fetch(url).then(r=>r.json());
+    const geores=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(cfg.city)+'&count=1&format=json');
+    if(!geores.ok)throw new Error('Localitatea nu poate fi verificată');
+    const g=await geores.json();
+    if(!g.results?.length)throw new Error('Localitate negăsită: '+cfg.city);
+    const {latitude,longitude,name}=g.results[0];
+    const query=new URLSearchParams({
+      latitude,longitude,
+      current:'temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m',
+      hourly:'temperature_2m,apparent_temperature,weather_code,precipitation_probability,precipitation,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,uv_index,cloud_cover,pressure_msl,visibility,dew_point_2m',
+      daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,rain_sum,snowfall_sum,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,uv_index_max,sunrise,sunset,sunshine_duration,daylight_duration',
+      timezone:'Europe/Bucharest',forecast_days:'14'
+    });
+    const res=await fetch('https://api.open-meteo.com/v1/forecast?'+query);
+    if(!res.ok)throw new Error('Serviciul meteo indisponibil');
+    const d=await res.json();
+    if(d.error||!d.hourly?.time?.length||!d.daily?.time?.length)throw new Error(d.reason||'Date meteo incomplete');
+    weatherData=d;
+    weatherLocation=name||cfg.city;
     const c=d.current||{};
-    document.getElementById('weather-city').textContent=name||cfg.city;
+    document.getElementById('weather-city').textContent=weatherLocation;
     document.getElementById('weather-now-icon').textContent=WC[c.weather_code]||'🌡';
-    document.getElementById('weather-now-temp').textContent=Math.round(c.temperature_2m)+'°';
+    document.getElementById('weather-now-temp').textContent=wxRound(c.temperature_2m)+'°';
     document.getElementById('weather-condition').textContent=WDESC[c.weather_code]||'Vreme';
-    document.getElementById('weather-feels').textContent='Se simte ca '+Math.round(c.apparent_temperature)+'°';
-    document.getElementById('weather-wind').textContent=Math.round(c.wind_speed_10m)+' km/h';
-    document.getElementById('weather-humidity').textContent=Math.round(c.relative_humidity_2m)+'%';
+    document.getElementById('weather-feels').textContent='Se simte ca '+wxRound(c.apparent_temperature)+'°';
+    document.getElementById('weather-wind').textContent=wxValue(c.wind_speed_10m,'km/h');
+    document.getElementById('weather-humidity').textContent=wxValue(c.relative_humidity_2m,'%');
+    document.getElementById('weather-minmax').textContent='Min '+wxRound(d.daily.temperature_2m_min?.[0])+'° · Max '+wxRound(d.daily.temperature_2m_max?.[0])+'°';
 
-    const todayMin=d.daily?.temperature_2m_min?.[0],todayMax=d.daily?.temperature_2m_max?.[0];
-    document.getElementById('weather-minmax').textContent='Min '+Math.round(todayMin)+'° · Max '+Math.round(todayMax)+'°';
-
-    const now=new Date();
-    const times=d.hourly.time.map(t=>new Date(t));
-    let startIdx=times.findIndex(t=>t>=now);
+    // Datele Open-Meteo sunt în fusul Europe/Bucharest.
+    const times=d.hourly.time;
+    let startIdx=times.findIndex(t=>t>=String(c.time||times[0]));
     if(startIdx<0)startIdx=0;
-    const currentPop=d.hourly.precipitation_probability?.[startIdx]??0;
-    document.getElementById('weather-rain').textContent=Math.round(currentPop)+'%';
-
+    const popNow=d.hourly.precipitation_probability?.[startIdx]??0;
+    document.getElementById('weather-rain').textContent=wxRound(popNow)+'%';
     const hourWrap=document.getElementById('weather-hourly');
     hourWrap.innerHTML='';
     for(let n=0;n<8;n++){
       const i=startIdx+n*2;
       if(i>=times.length)break;
-      const pop=Math.round(d.hourly.precipitation_probability?.[i]??0);
+      const pop=wxRound(d.hourly.precipitation_probability?.[i]??0);
       const div=document.createElement('div');
       div.className='weather-hour';
-      div.innerHTML='<div class="weather-hour-time">'+pad(times[i].getHours())+':00</div>'+ 
-        '<div class="weather-hour-icon">'+(WC[d.hourly.weather_code[i]]||'🌡')+'</div>'+ 
-        '<div class="weather-hour-temp">'+Math.round(d.hourly.temperature_2m[i])+'°</div>'+ 
+      div.innerHTML='<div class="weather-hour-time">'+wxTime(times[i])+'</div>'+
+        '<div class="weather-hour-icon">'+(WC[d.hourly.weather_code?.[i]]||'🌡')+'</div>'+
+        '<div class="weather-hour-temp">'+wxRound(d.hourly.temperature_2m?.[i])+'°</div>'+
         '<div class="weather-hour-rain">'+(pop>=20?pop+'%':'')+'</div>';
       hourWrap.appendChild(div);
     }
-
     let rainStart=-1,rainEnd=-1,maxPop=0,total=0;
     const endIdx=Math.min(startIdx+24,times.length);
     for(let i=startIdx;i<endIdx;i++){
@@ -489,25 +588,180 @@ async function fetchWeather(){
       const mm=d.hourly.precipitation?.[i]??0;
       if(pop>=40||mm>=0.2){if(rainStart<0)rainStart=i;rainEnd=i;maxPop=Math.max(maxPop,pop);total+=mm;}
     }
-    const rainNote=document.getElementById('weather-rain-note');
-    if(rainStart>=0){
-      rainNote.textContent='Ploaie posibilă '+pad(times[rainStart].getHours())+':00–'+pad((times[rainEnd].getHours()+1)%24)+':00 · '+Math.round(maxPop)+'% · ~'+total.toFixed(1)+' mm';
-    }else rainNote.textContent='Fără ploaie semnificativă în următoarele 24 h';
-
+    document.getElementById('weather-rain-note').textContent=rainStart>=0?
+      'Ploaie posibilă '+wxTime(times[rainStart])+'–'+wxTime(times[rainEnd])+' · '+Math.round(maxPop)+'% · ~'+total.toFixed(1)+' mm':
+      'Fără ploaie semnificativă în următoarele 24 h';
     const days=document.getElementById('weather-days');
     days.innerHTML='';
     for(let i=0;i<Math.min(5,d.daily.time.length);i++){
-      const dt=new Date(d.daily.time[i]+'T12:00:00');
-      const pop=Math.round(d.daily.precipitation_probability_max?.[i]??0);
+      const pop=wxRound(d.daily.precipitation_probability_max?.[i]??0);
       const row=document.createElement('div');
       row.className='weather-day';
-      row.innerHTML='<div class="weather-day-name">'+(i===0?'Azi':WDAY[dt.getDay()])+'</div>'+ 
-        '<div class="weather-day-icon">'+(WC[d.daily.weather_code[i]]||'🌡')+'</div>'+ 
-        '<div class="weather-day-temp">'+Math.round(d.daily.temperature_2m_min[i])+'° / '+Math.round(d.daily.temperature_2m_max[i])+'°</div>'+ 
+      row.innerHTML='<div class="weather-day-name">'+(i===0?'Azi':wxDate(d.daily.time[i],{weekday:'short'}))+'</div>'+
+        '<div class="weather-day-icon">'+(WC[d.daily.weather_code[i]]||'🌡')+'</div>'+
+        '<div class="weather-day-temp">'+wxRound(d.daily.temperature_2m_min[i])+'° / '+wxRound(d.daily.temperature_2m_max[i])+'°</div>'+
         '<div class="weather-day-rain">'+(pop>=20?pop+'%':'')+'</div>';
       days.appendChild(row);
     }
-  }catch(e){console.warn('weather',e);}
+    if(!selectedWeatherDate||!d.daily.time.includes(selectedWeatherDate))selectedWeatherDate=d.daily.time[0];
+    if(!document.getElementById('weather-detail-overlay').classList.contains('gone'))renderWeatherDetail();
+  }catch(e){
+    console.warn('weather',e);
+    if(!weatherData){
+      document.getElementById('weather-condition').textContent='Prognoza nu este disponibilă';
+      if(!document.getElementById('weather-detail-overlay').classList.contains('gone')){
+        document.getElementById('wd-content').innerHTML='<div class="wd-status">Nu s-a putut încărca prognoza. Verifică conexiunea și încearcă „Actualizează”.</div>';
+      }
+    }
+  }finally{
+    weatherRequestPending=false;
+    if(refresh)refresh.disabled=false;
+  }
+}
+
+function openWeatherDetail(){
+  weatherFocusBeforeOpen=document.activeElement;
+  document.getElementById('weather-detail-overlay').classList.remove('gone');
+  document.getElementById('wd-close').focus();
+  renderWeatherDetail();
+  if(!weatherData)fetchWeather();
+}
+function closeWeatherDetail(){
+  document.getElementById('weather-detail-overlay').classList.add('gone');
+  if(weatherFocusBeforeOpen?.focus)weatherFocusBeforeOpen.focus();
+}
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('weather-detail-overlay').classList.contains('gone'))return;
+  if(e.key==='Escape'){e.preventDefault();closeWeatherDetail();return;}
+  if(e.key==='Tab'){
+    const focusables=[...document.querySelectorAll('#weather-detail-overlay button:not([disabled])')];
+    const first=focusables[0],last=focusables[focusables.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  }
+});
+function selectWeatherDate(date){
+  if(!weatherData?.daily.time.includes(date))return;
+  selectedWeatherDate=date;
+  document.querySelectorAll('.wd-day').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.date===date)));
+  renderWeatherDay();
+}
+function wxMetric(label,value){
+  return '<div class="wd-metric"><div class="wd-metric-label">'+label+'</div><div class="wd-metric-value">'+value+'</div></div>';
+}
+function renderWeatherDetail(){
+  const content=document.getElementById('wd-content');
+  if(!weatherData){content.innerHTML='<div class="wd-status">Se încarcă prognoza...</div>';return;}
+  const daily=weatherData.daily;
+  document.getElementById('wd-location').textContent=weatherLocation+' · Actualizare: '+wxTime(weatherData.current?.time)+' · Open-Meteo';
+  content.innerHTML='<div class="wd-section-title">Alege ziua · următoarele 14 zile</div><div class="wd-days" id="wd-days-14"></div>'+
+    '<div class="wd-focus" id="wd-focus"></div><div class="wd-metrics" id="wd-metrics"></div>'+
+    '<div class="wd-section-title">Evoluția temperaturii și probabilitatea de precipitații</div>'+
+    '<div class="wd-chart-legend"><span class="wd-chart-line">━ Temperatura, °C</span><span class="wd-chart-bar">▮ Probabilitatea ploii, %</span></div>'+
+    '<div class="wd-chart" id="wd-chart"></div><div class="wd-section-title">Prognoză orară · derulează tabelul pentru mai multe detalii</div>'+
+    '<div class="wd-table-wrap" id="wd-table-wrap"></div>'+
+    '<p class="wd-foot">Date: Open-Meteo, ora României. Valorile sunt estimări meteorologice; prognoza pentru zilele 8–14 are o incertitudine mai mare. Probabilitatea de precipitații (%) și cantitatea (mm) sunt indicatori diferiți.</p>';
+  const daysWrap=document.getElementById('wd-days-14');
+  daily.time.slice(0,14).forEach((date,i)=>{
+    const b=document.createElement('button');
+    b.type='button';b.className='wd-day';b.dataset.date=date;
+    b.setAttribute('aria-pressed',String(date===selectedWeatherDate));
+    b.setAttribute('aria-label',wxDate(date)+'; '+WDESC[daily.weather_code?.[i]]);
+    b.innerHTML='<span class="wd-day-name">'+(i===0?'Azi':wxDate(date,{weekday:'short'}))+'</span>'+
+      '<span class="wd-day-date">'+wxDate(date,{day:'numeric',month:'short'})+'</span>'+
+      '<span class="wd-day-icon">'+(WC[daily.weather_code?.[i]]||'🌡')+'</span>'+
+      '<span class="wd-day-range">'+wxRound(daily.temperature_2m_max?.[i])+'° / '+wxRound(daily.temperature_2m_min?.[i])+'°</span>'+
+      '<span class="wd-day-rain">'+wxRound(daily.precipitation_probability_max?.[i])+'% ploaie</span>';
+    b.addEventListener('click',()=>selectWeatherDate(date));
+    daysWrap.appendChild(b);
+  });
+  renderWeatherDay();
+}
+function renderWeatherDay(){
+  const d=weatherData;
+  if(!d)return;
+  const idx=d.daily.time.indexOf(selectedWeatherDate);
+  if(idx<0)return;
+  const daily=d.daily;
+  const h=d.hourly;
+  const ids=h.time.map((t,i)=>t.slice(0,10)===selectedWeatherDate?i:-1).filter(i=>i>=0);
+  const avg=(key)=>{
+    const arr=ids.map(i=>h[key]?.[i]).filter(v=>Number.isFinite(v));
+    return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null;
+  };
+  const min=(key)=>{
+    const arr=ids.map(i=>h[key]?.[i]).filter(v=>Number.isFinite(v));
+    return arr.length?Math.min(...arr):null;
+  };
+  document.getElementById('wd-focus').innerHTML='<div><div class="wd-focus-date">'+wxDate(selectedWeatherDate)+'</div>'+
+    '<div class="wd-focus-summary">'+(WDESC[daily.weather_code?.[idx]]||'Prognoză')+'</div>'+
+    '<div class="wd-focus-range">Max '+wxRound(daily.temperature_2m_max?.[idx])+'°C · Min '+wxRound(daily.temperature_2m_min?.[idx])+'°C</div></div>'+
+    '<div class="wd-focus-icon" aria-hidden="true">'+(WC[daily.weather_code?.[idx]]||'🌡')+'</div>';
+  document.getElementById('wd-metrics').innerHTML=[
+    wxMetric('Probabilitate precipitații',wxValue(daily.precipitation_probability_max?.[idx],'%')),
+    wxMetric('Precipitații totale',wxValue(daily.precipitation_sum?.[idx],'mm',1)),
+    wxMetric('Vânt maxim',wxValue(daily.wind_speed_10m_max?.[idx],'km/h')),
+    wxMetric('Rafale maxime',wxValue(daily.wind_gusts_10m_max?.[idx],'km/h')),
+    wxMetric('Umiditate medie',wxValue(avg('relative_humidity_2m'),'%')),
+    wxMetric('Indice UV maxim',wxNumber(daily.uv_index_max?.[idx],1)),
+    wxMetric('Răsărit / apus',wxTime(daily.sunrise?.[idx])+' / '+wxTime(daily.sunset?.[idx])),
+    wxMetric('Ore de soare',wxHours(daily.sunshine_duration?.[idx])),
+    wxMetric('Durata zilei',wxHours(daily.daylight_duration?.[idx])),
+    wxMetric('Presiune medie',wxValue(avg('pressure_msl'),'hPa')),
+    wxMetric('Vizibilitate minimă',min('visibility')==null?'—':wxValue(min('visibility')/1000,'km',1)),
+    wxMetric('Direcție dominantă vânt',wxWindDir(daily.wind_direction_10m_dominant?.[idx]))
+  ].join('');
+  drawWeatherChart(ids);
+  const table=document.getElementById('wd-table-wrap');
+  if(!ids.length){table.innerHTML='<div class="wd-status">Nu există date orare disponibile.</div>';return;}
+  const cols=[['Ora','time'],['Vreme','icon'],['Temp.','temperature_2m'],['Resimțită','apparent_temperature'],['Ploaie','precipitation_probability'],['Cantitate','precipitation'],['Vânt','wind_speed_10m'],['Rafale','wind_gusts_10m'],['Direcție','wind_direction_10m'],['Umid.','relative_humidity_2m'],['UV','uv_index'],['Nori','cloud_cover'],['Presiune','pressure_msl']];
+  let html='<table class="wd-table"><thead><tr>'+cols.map(([name])=>'<th scope="col">'+name+'</th>').join('')+'</tr></thead><tbody>';
+  const nowHour=d.current?.time?.slice(0,13);
+  ids.forEach(i=>{
+    html+='<tr'+(h.time[i].slice(0,13)===nowHour?' class="wd-current-hour"':'')+'>'+
+      '<td>'+wxTime(h.time[i])+'</td><td>'+(WC[h.weather_code?.[i]]||'🌡')+'</td>'+
+      '<td>'+wxRound(h.temperature_2m?.[i])+'°</td><td>'+wxRound(h.apparent_temperature?.[i])+'°</td>'+
+      '<td>'+wxValue(h.precipitation_probability?.[i],'%')+'</td><td>'+wxValue(h.precipitation?.[i],'mm',1)+'</td>'+
+      '<td>'+wxValue(h.wind_speed_10m?.[i],'km/h')+'</td><td>'+wxValue(h.wind_gusts_10m?.[i],'km/h')+'</td>'+
+      '<td>'+wxWindDir(h.wind_direction_10m?.[i])+'</td><td>'+wxValue(h.relative_humidity_2m?.[i],'%')+'</td>'+
+      '<td>'+wxNumber(h.uv_index?.[i],1)+'</td><td>'+wxValue(h.cloud_cover?.[i],'%')+'</td>'+
+      '<td>'+wxValue(h.pressure_msl?.[i],'hPa')+'</td></tr>';
+  });
+  table.innerHTML=html+'</tbody></table>';
+}
+function drawWeatherChart(ids){
+  const chart=document.getElementById('wd-chart');
+  if(!ids.length){chart.innerHTML='<div class="wd-status">Grafic indisponibil</div>';return;}
+  const h=weatherData.hourly;
+  const temps=ids.map(i=>Number(h.temperature_2m?.[i]));
+  const valid=temps.filter(Number.isFinite);
+  if(!valid.length){chart.innerHTML='<div class="wd-status">Temperaturi indisponibile</div>';return;}
+  let lo=Math.floor(Math.min(...valid)-2),hi=Math.ceil(Math.max(...valid)+2);
+  if(lo===hi)hi=lo+1;
+  const left=48,right=16,top=14,bottom=35,w=930,height=210;
+  const cw=w-left-right,ch=height-top-bottom;
+  const x=(n)=>left+(ids.length===1?cw/2:n*cw/(ids.length-1));
+  const y=(t)=>top+(hi-t)/(hi-lo)*ch;
+  const points=ids.map((id,n)=>Number.isFinite(temps[n])?x(n).toFixed(1)+','+y(temps[n]).toFixed(1):null).filter(Boolean).join(' ');
+  let svg='<svg viewBox="0 0 930 210" role="img" aria-label="Temperatura și probabilitatea de precipitații pe ore pentru ziua aleasă">';
+  for(let z=0;z<=4;z++){
+    const value=lo+(hi-lo)*(4-z)/4;
+    const cy=top+ch*z/4;
+    svg+='<line x1="'+left+'" y1="'+cy+'" x2="'+(w-right)+'" y2="'+cy+'" stroke="#3a4e67" stroke-width="1"/>'+
+      '<text x="'+(left-9)+'" y="'+(cy+4)+'" text-anchor="end" font-size="12" fill="#91a8c2">'+value.toFixed(0)+'°</text>';
+  }
+  ids.forEach((id,n)=>{
+    const pop=Math.max(0,Math.min(100,Number(h.precipitation_probability?.[id])||0));
+    const bw=Math.max(4,cw/Math.max(24,ids.length)*.65);
+    const bh=pop/100*ch;
+    svg+='<rect x="'+(x(n)-bw/2).toFixed(1)+'" y="'+(top+ch-bh).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+bh.toFixed(1)+'" fill="#639ec5" opacity=".43"><title>'+wxTime(h.time[id])+' · '+pop+'% precipitații</title></rect>';
+    if(n%3===0||n===ids.length-1)svg+='<text x="'+x(n).toFixed(1)+'" y="'+(height-10)+'" fill="#9db2c9" font-size="12" text-anchor="middle">'+wxTime(h.time[id])+'</text>';
+  });
+  svg+='<polyline points="'+points+'" stroke="#f2ce8b" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
+  ids.forEach((id,n)=>{
+    if(Number.isFinite(temps[n])&&(n%3===0||n===ids.length-1))svg+='<circle cx="'+x(n).toFixed(1)+'" cy="'+y(temps[n]).toFixed(1)+'" r="3.5" fill="#f2ce8b"><title>'+wxTime(h.time[id])+' · '+temps[n].toFixed(1)+'°C</title></circle>';
+  });
+  chart.innerHTML=svg+'</svg>';
 }
 
 // ── FETCH EVENTS ──
